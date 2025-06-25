@@ -1,0 +1,18 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+vpodcasts.egg-info/
+
+# Generated files
+episodes/
+feed.xml
+podcast.json
+
+# Environment variables
+.env
+
+# macOS
+.DS_Store

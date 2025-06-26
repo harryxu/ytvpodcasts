@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- 配置 ---
-# 这些值应该与 ypd.py 中的保持一致
+# --- Configuration ---
+# These values should be consistent with those in ypd.py
 EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
 RSS_FILE = os.getenv("RSS_FILE", "feed.xml")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
@@ -14,17 +14,17 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # 提供 RSS feed 文件
+    # Provide the RSS feed file
     return send_from_directory('.', RSS_FILE)
 
 @app.route('/episodes/<path:filename>')
 def download_episode(filename):
-    # 提供音频文件
+    # Provide the audio files
     return send_from_directory(EPISODES_DIR, filename)
 
 def main():
-    """主函数，启动服务器"""
-    # 在启动服务器前，检查RSS文件是否存在
+    """Main function, starts the server"""
+    # Before starting the server, check if the RSS file exists
     if not os.path.exists(RSS_FILE):
         print(f"Error: RSS feed '{RSS_FILE}' not found.")
         print("Please run 'python3 ypd.py generate' to create it first.")

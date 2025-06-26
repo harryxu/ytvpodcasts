@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- 配置 ---
+# --- Configuration ---
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 PODCAST_TITLE = os.getenv("PODCAST_TITLE", "My YouTube Podcast")
 PODCAST_DESCRIPTION = os.getenv(
@@ -17,14 +17,14 @@ PODCAST_DESCRIPTION = os.getenv(
 )
 PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
 
-# --- 文件和目录路径 ---
+# --- File and Directory Paths ---
 EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
 PODCAST_DATA_FILE = os.getenv("PODCAST_DATA_FILE", "podcast.json")
 RSS_FILE = os.getenv("RSS_FILE", "feed.xml")
 
 
 def initialize_project():
-    """检查并创建所需的目录和文件"""
+    """Check and create necessary directories and files"""
     if not os.path.exists(EPISODES_DIR):
         click.echo(f"Creating directory: {EPISODES_DIR}")
         os.makedirs(EPISODES_DIR)
@@ -38,7 +38,7 @@ def initialize_project():
 
 
 def get_video_info(youtube_url):
-    """使用 yt-dlp 获取视频的元数据"""
+    """Get video metadata using yt-dlp"""
     click.echo(f"Fetching metadata for {youtube_url}...")
     command = ["yt-dlp", "--dump-json", youtube_url]
     try:
@@ -54,7 +54,7 @@ def get_video_info(youtube_url):
 
 
 def download_audio(youtube_url):
-    """下载最佳质量的音频并保存到 episodes 目录"""
+    """Download the best quality audio and save it to the episodes directory"""
     click.echo(f"Starting audio download for {youtube_url}...")
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
     command = [
@@ -83,7 +83,7 @@ def download_audio(youtube_url):
 
 
 def generate_rss():
-    """从 podcast.json 生成 feed.xml"""
+    """Generate feed.xml from podcast.json"""
     click.echo("Generating RSS feed...")
     with open(PODCAST_DATA_FILE, "r") as f:
         data = json.load(f)
@@ -114,7 +114,7 @@ def generate_rss():
 
 
 def add_episode(youtube_url):
-    """处理 'add' 命令：下载、更新数据库、重新生成RSS"""
+    """Handle the 'add' command: download, update database, regenerate RSS"""
     initialize_project()
     info = get_video_info(youtube_url)
     if not info:

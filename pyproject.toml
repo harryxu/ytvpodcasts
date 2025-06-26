@@ -10,7 +10,8 @@ dependencies = [
     "yt-dlp==2025.6.9",
     "six==1.17.0",
     "flask>=2.0.0",
-    "python-dotenv==0.21.0"
+    "python-dotenv==0.21.0",
+    "click>=8.0.0"
 ]
 
 [tool.uv]

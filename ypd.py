@@ -6,6 +6,7 @@ import click
 from datetime import datetime
 from feedgen.feed import FeedGenerator
 from dotenv import load_dotenv
+import database as db
 
 load_dotenv()
 
@@ -19,7 +20,6 @@ PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
 
 # --- File and Directory Paths ---
 EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
-PODCAST_DATA_FILE = os.getenv("PODCAST_DATA_FILE", "podcast.json")
 RSS_FILE = os.getenv("RSS_FILE", "feed.xml")
 
 
@@ -29,11 +29,7 @@ def initialize_project():
         click.echo(f"Creating directory: {EPISODES_DIR}")
         os.makedirs(EPISODES_DIR)
 
-    if not os.path.exists(PODCAST_DATA_FILE):
-        click.echo(f"Creating empty database: {PODCAST_DATA_FILE}")
-        with open(PODCAST_DATA_FILE, "w") as f:
-            json.dump({"episodes": []}, f, indent=4)
-
+    db.create_db_and_tables()
     click.echo("Initialization complete.")
 
 
@@ -83,10 +79,9 @@ def download_audio(youtube_url):
 
 
 def generate_rss():
-    """Generate feed.xml from podcast.json"""
+    """Generate feed.xml from the database"""
     click.echo("Generating RSS feed...")
-    with open(PODCAST_DATA_FILE, "r") as f:
-        data = json.load(f)
+    episodes = db.get_all_episodes()
 
     fg = FeedGenerator()
     fg.title(PODCAST_TITLE)
@@ -94,19 +89,17 @@ def generate_rss():
     fg.description(PODCAST_DESCRIPTION)
     fg.language("en")
 
-    for episode_info in sorted(
-        data["episodes"], key=lambda x: x["upload_date"], reverse=True
-    ):
+    for episode_info in episodes:
         fe = fg.add_entry()
-        fe.id(episode_info["webpage_url"])
-        fe.title(episode_info["title"])
-        fe.description(episode_info["description"])
-        pub_date = datetime.strptime(episode_info["upload_date"], "%Y%m%d").strftime(
+        fe.id(episode_info.webpage_url)
+        fe.title(episode_info.title)
+        fe.description(episode_info.description)
+        pub_date = datetime.strptime(episode_info.upload_date, "%Y%m%d").strftime(
             "%a, %d %b %Y %H:%M:%S %z"
         )
         fe.published(pub_date + " +0000")
-        audio_url = f"{BASE_URL}/{episode_info['audio_file']}"
-        file_size = str(os.path.getsize(episode_info["audio_file"]))
+        audio_url = f"{BASE_URL}/{episode_info.audio_file}"
+        file_size = str(os.path.getsize(episode_info.audio_file))
         fe.enclosure(url=audio_url, length=file_size, type="audio/x-m4a")
 
     fg.rss_file(RSS_FILE, pretty=True)
@@ -120,10 +113,7 @@ def add_episode(youtube_url):
     if not info:
         return
 
-    with open(PODCAST_DATA_FILE, "r") as f:
-        podcast_data = json.load(f)
-
-    if any(ep["id"] == info["id"] for ep in podcast_data["episodes"]):
+    if db.episode_exists(info["id"]):
         click.echo(f"Video '{info['title']}' already exists in the podcast. Skipping.")
         return
 
@@ -142,10 +132,8 @@ def add_episode(youtube_url):
         "audio_file": audio_path,
     }
 
-    podcast_data["episodes"].append(episode_data)
-    with open(PODCAST_DATA_FILE, "w") as f:
-        json.dump(podcast_data, f, indent=4)
-    click.echo(f"Added '{info['title']}' to {PODCAST_DATA_FILE}")
+    db.add_episode(episode_data)
+    click.echo(f"Added '{info['title']}' to the database.")
     generate_rss()
 
 

@@ -1,0 +1,13 @@
+from sqlmodel import Field, SQLModel
+from typing import Optional
+
+
+class Episode(SQLModel, table=True):
+    id: str = Field(default=None, primary_key=True)
+    title: str
+    description: Optional[str] = None
+    webpage_url: str = Field(unique=True)
+    upload_date: Optional[str] = None
+    duration: Optional[int] = None
+    thumbnail: Optional[str] = None
+    audio_file: Optional[str] = None

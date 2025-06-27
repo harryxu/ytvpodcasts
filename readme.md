@@ -24,6 +24,22 @@ The system consists of two main components:
 
 ## Usage
 
+### Database Migrations
+
+When you change the database models in `models.py`, you need to create and apply a migration to update the database schema.
+
+1.  **Generate a new migration script:**
+
+    ```bash
+    /Users/harry/dev/vpodcasts/.venv/bin/alembic revision --autogenerate -m "Your migration message"
+    ```
+
+2.  **Apply the migration to the database:**
+
+    ```bash
+    /Users/harry/dev/vpodcasts/.venv/bin/alembic upgrade head
+    ```
+
 ### Adding a new episode
 
 To add a new YouTube video to your podcast, run the following command:

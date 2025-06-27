@@ -16,3 +16,5 @@ podcast.json
 
 # macOS
 .DS_Store
+
+*.db

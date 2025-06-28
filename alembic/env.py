@@ -16,7 +16,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from models import Episode
+from vpodcasts.models import Episode
 target_metadata = Episode.metadata
 
 # other values from the config, defined by the needs of env.py,

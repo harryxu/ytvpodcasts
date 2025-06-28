@@ -1,6 +1,6 @@
 from sqlmodel import create_engine, SQLModel, Session, select
-from models import Episode
-from config import DB_FILE
+from vpodcasts.models import Episode
+from vpodcasts.config import DB_FILE
 
 engine = create_engine(f"sqlite:///{DB_FILE}")
 

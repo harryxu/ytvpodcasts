@@ -14,13 +14,11 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync
 
 # Copy the rest of the application files
-COPY webapp.py .
-COPY database.py .
-COPY models.py .
 COPY alembic.ini .
 COPY alembic/ ./alembic/
+COPY vpodcasts/ ./vpodcasts/
 
 RUN mkdir data
 
 # Command to run the application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "webapp:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "vpodcasts.webapp:app"]

@@ -5,8 +5,8 @@ import sys
 
 import click
 
-import database as db
-from config import EPISODES_DIR
+import vpodcasts.database as db
+from vpodcasts.config import EPISODES_DIR
 
 
 def initialize_project():

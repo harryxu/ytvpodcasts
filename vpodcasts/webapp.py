@@ -1,8 +1,8 @@
 from flask import Flask, send_from_directory, Response
 from datetime import datetime
-from database import get_all_episodes, create_db_and_tables
+from vpodcasts.database import get_all_episodes, create_db_and_tables
 from feedgen.feed import FeedGenerator
-from config import (
+from vpodcasts.config import (
     EPISODES_DIR,
     BASE_URL,
     PODCAST_TITLE,

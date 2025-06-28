@@ -134,7 +134,6 @@ def add_episode(youtube_url):
 
     db.add_episode(episode_data)
     click.echo(f"Added '{info['title']}' to the database.")
-    generate_rss()
 
 
 @click.group()

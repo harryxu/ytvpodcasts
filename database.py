@@ -1,8 +1,7 @@
-import os
 from sqlmodel import create_engine, SQLModel, Session, select
 from models import Episode
+from config import DB_FILE
 
-DB_FILE = os.getenv("DB_FILE", "vpodcasts.db")
 engine = create_engine(f"sqlite:///{DB_FILE}")
 
 

@@ -1,21 +1,13 @@
-import os
 from flask import Flask, send_from_directory, Response
-from dotenv import load_dotenv
 from datetime import datetime
 from database import get_all_episodes, create_db_and_tables
 from feedgen.feed import FeedGenerator
-
-load_dotenv()
-
-# --- Configuration ---
-# These values should be consistent with those in ypd.py
-EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-PODCAST_TITLE = os.getenv("PODCAST_TITLE", "My YouTube Podcast")
-PODCAST_DESCRIPTION = os.getenv(
-    "PODCAST_DESCRIPTION", "A podcast generated from YouTube videos."
+from config import (
+    EPISODES_DIR,
+    BASE_URL,
+    PODCAST_TITLE,
+    PODCAST_DESCRIPTION,
 )
-PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
 
 app = Flask(__name__)
 

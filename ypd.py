@@ -1,23 +1,12 @@
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
+
 import click
-from dotenv import load_dotenv
+
 import database as db
-
-load_dotenv()
-
-# --- Configuration ---
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-PODCAST_TITLE = os.getenv("PODCAST_TITLE", "My YouTube Podcast")
-PODCAST_DESCRIPTION = os.getenv(
-    "PODCAST_DESCRIPTION", "A podcast generated from YouTube videos."
-)
-PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
-
-# --- File and Directory Paths ---
-EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
+from config import EPISODES_DIR
 
 
 def initialize_project():
@@ -94,13 +83,13 @@ def add_episode(youtube_url):
     audio_file_size = os.path.getsize(audio_file_path)
     # Determine audio file type from file extension
     _, file_extension = os.path.splitext(audio_path)
-    if file_extension == '.m4a':
-        audio_file_type = 'audio/mp4'
-    elif file_extension == '.mp3':
-        audio_file_type = 'audio/mpeg'
+    if file_extension == ".m4a":
+        audio_file_type = "audio/mp4"
+    elif file_extension == ".mp3":
+        audio_file_type = "audio/mpeg"
     else:
         # Default or could be expanded
-        audio_file_type = 'audio/mpeg'
+        audio_file_type = "audio/mpeg"
 
     episode_data = {
         "id": info["id"],

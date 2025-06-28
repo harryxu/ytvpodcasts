@@ -1,9 +1,0 @@
-services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./episodes:/app/episodes
-      - ./podcast.json:/app/podcast.json
-      - ./feed.xml:/app/feed.xml

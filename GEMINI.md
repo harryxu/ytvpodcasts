@@ -12,3 +12,6 @@
 4.  **Generate Message:** Create a descriptive commit message in English, summarizing the changes.
 5.  **Execute Commit:** Run `git commit -m "..."` with the generated message.
 6.  **Confirm:** Run `git status` again to confirm the commit was successful.
+
+## Gemini Added Memories
+- use uv to install python dependencies

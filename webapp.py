@@ -19,6 +19,7 @@ PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
 
 app = Flask(__name__)
 
+
 def generate_rss_feed():
     episodes = get_all_episodes()
 
@@ -40,33 +41,39 @@ def generate_rss_feed():
         audio_url = f"{BASE_URL}/episodes/{episode_info.audio_file}"
         # Ensure audio_file exists before trying to get its size
         audio_file_path = os.path.join(EPISODES_DIR, episode_info.audio_file)
-        file_size = str(os.path.getsize(audio_file_path)) if os.path.exists(audio_file_path) else "0"
+        file_size = (
+            str(os.path.getsize(audio_file_path))
+            if os.path.exists(audio_file_path)
+            else "0"
+        )
         fe.enclosure(url=audio_url, length=file_size, type="audio/mpeg")
 
     return fg.rss_str(pretty=True)
 
-@app.route('/')
+
+@app.route("/")
 def index():
     # Provide the RSS feed dynamically
     rss_feed = generate_rss_feed()
-    return Response(rss_feed, mimetype='application/xml')
+    return Response(rss_feed, mimetype="application/xml")
 
-@app.route('/episodes/<path:filename>')
+
+@app.route("/episodes/<path:filename>")
 def download_episode(filename):
     # Provide the audio files
     return send_from_directory(EPISODES_DIR, filename)
 
 
-
 def main():
     """Main function, starts the server"""
-    create_db_and_tables() # Ensure database and tables are created
+    create_db_and_tables()  # Ensure database and tables are created
     port = 8000
     print(f"Starting Flask server at http://localhost:{port}")
     print(f"Serving RSS feed: {BASE_URL}/")
     print(f"Serving episodes from: ./{EPISODES_DIR}/")
     print("Press Ctrl+C to stop the server.")
-    app.run(host='0.0.0.0', port=port)
+    app.run(host="0.0.0.0", port=port)
+
 
 if __name__ == "__main__":
     main()

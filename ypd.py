@@ -3,8 +3,6 @@ import sys
 import json
 import subprocess
 import click
-from datetime import datetime
-from feedgen.feed import FeedGenerator
 from dotenv import load_dotenv
 import database as db
 
@@ -20,7 +18,6 @@ PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
 
 # --- File and Directory Paths ---
 EPISODES_DIR = os.getenv("EPISODES_DIR", "episodes")
-RSS_FILE = os.getenv("RSS_FILE", "feed.xml")
 
 
 def initialize_project():
@@ -67,7 +64,7 @@ def download_audio(youtube_url):
         info = get_video_info(youtube_url)
         if info:
             filename = f"{info['id']}.m4a"
-            return os.path.join(EPISODES_DIR, filename)
+            return filename
     except subprocess.CalledProcessError as e:
         click.echo(f"Error downloading audio: {e}", err=True)
         return None
@@ -76,34 +73,6 @@ def download_audio(youtube_url):
         click.echo("Please install yt-dlp: pip install yt-dlp", err=True)
         sys.exit(1)
     return None
-
-
-def generate_rss():
-    """Generate feed.xml from the database"""
-    click.echo("Generating RSS feed...")
-    episodes = db.get_all_episodes()
-
-    fg = FeedGenerator()
-    fg.title(PODCAST_TITLE)
-    fg.link(href=BASE_URL, rel="alternate")
-    fg.description(PODCAST_DESCRIPTION)
-    fg.language("en")
-
-    for episode_info in episodes:
-        fe = fg.add_entry()
-        fe.id(episode_info.webpage_url)
-        fe.title(episode_info.title)
-        fe.description(episode_info.description)
-        pub_date = datetime.strptime(episode_info.upload_date, "%Y%m%d").strftime(
-            "%a, %d %b %Y %H:%M:%S %z"
-        )
-        fe.published(pub_date + " +0000")
-        audio_url = f"{BASE_URL}/{episode_info.audio_file}"
-        file_size = str(os.path.getsize(episode_info.audio_file))
-        fe.enclosure(url=audio_url, length=file_size, type="audio/x-m4a")
-
-    fg.rss_file(RSS_FILE, pretty=True)
-    click.echo(f"RSS feed saved to {RSS_FILE}")
 
 
 def add_episode(youtube_url):
@@ -153,12 +122,6 @@ def init():
 def add(url):
     """Add a new YouTube video to the podcast."""
     add_episode(url)
-
-
-@cli.command()
-def generate():
-    """Force regenerate the RSS feed from existing data."""
-    generate_rss()
 
 
 @cli.command()

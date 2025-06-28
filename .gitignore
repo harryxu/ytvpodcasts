@@ -8,7 +8,6 @@ vpodcasts.egg-info/
 
 # Generated files
 episodes/
-feed.xml
 podcast.json
 
 # Environment variables

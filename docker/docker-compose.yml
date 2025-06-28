@@ -1,7 +1,20 @@
 services:
   web:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    expose:
+      - "5000"
+    volumes:
+      - ./data:/app/data
+      - ./episodes:/app/episodes
+
+  nginx:
+    image: nginx:latest
     ports:
-      - "5000:5000"
-    # volumes:
-      # - ./data:/app/data
+      - "8089:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./episodes:/app/episodes:ro
+    depends_on:
+      - web

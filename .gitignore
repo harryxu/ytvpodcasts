@@ -1,3 +1,6 @@
+*.db
+build/
+
 # Python virtual environment
 .venv/
 
@@ -16,4 +19,3 @@ podcast.json
 # macOS
 .DS_Store
 
-*.db

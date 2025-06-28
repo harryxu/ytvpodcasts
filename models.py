@@ -11,3 +11,5 @@ class Episode(SQLModel, table=True):
     duration: Optional[int] = None
     thumbnail: Optional[str] = None
     audio_file: Optional[str] = None
+    audio_file_size: Optional[int] = None
+    audio_file_type: Optional[str] = None

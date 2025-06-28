@@ -39,14 +39,11 @@ def generate_rss_feed():
         )
         fe.published(pub_date + " +0000")
         audio_url = f"{BASE_URL}/episodes/{episode_info.audio_file}"
-        # Ensure audio_file exists before trying to get its size
-        audio_file_path = os.path.join(EPISODES_DIR, episode_info.audio_file)
-        file_size = (
-            str(os.path.getsize(audio_file_path))
-            if os.path.exists(audio_file_path)
-            else "0"
+        fe.enclosure(
+            url=audio_url,
+            length=str(episode_info.audio_file_size),
+            type=episode_info.audio_file_type,
         )
-        fe.enclosure(url=audio_url, length=file_size, type="audio/mpeg")
 
     return fg.rss_str(pretty=True)
 

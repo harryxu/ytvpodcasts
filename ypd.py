@@ -90,6 +90,18 @@ def add_episode(youtube_url):
     if not audio_path:
         return
 
+    audio_file_path = os.path.join(EPISODES_DIR, audio_path)
+    audio_file_size = os.path.getsize(audio_file_path)
+    # Determine audio file type from file extension
+    _, file_extension = os.path.splitext(audio_path)
+    if file_extension == '.m4a':
+        audio_file_type = 'audio/mp4'
+    elif file_extension == '.mp3':
+        audio_file_type = 'audio/mpeg'
+    else:
+        # Default or could be expanded
+        audio_file_type = 'audio/mpeg'
+
     episode_data = {
         "id": info["id"],
         "title": info["title"],
@@ -99,6 +111,8 @@ def add_episode(youtube_url):
         "duration": info.get("duration"),
         "thumbnail": info.get("thumbnail"),
         "audio_file": audio_path,
+        "audio_file_size": audio_file_size,
+        "audio_file_type": audio_file_type,
     }
 
     db.add_episode(episode_data)

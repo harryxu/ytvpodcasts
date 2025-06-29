@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name localhost;
+    server_name ${NGINX_SERVER_NAME};
 
     # Set client body size to prevent errors with large audio files
     client_max_body_size 1024M;
@@ -14,7 +14,7 @@ server {
     }
 
     location /episodes/ {
-        alias /app/episodes/;
+        alias /app/data/episodes/;
         try_files $uri =404;
     }
 }

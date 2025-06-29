@@ -7,13 +7,14 @@ dependencies = [
     "feedgen==1.0.0",
     "lxml==5.4.0",
     "python-dateutil==2.9.0.post0",
-    "yt-dlp==2025.6.9",
-    "six==1.17.0",
+    "yt-dlp>=2025.6.9",
+    "six>=1.17.0",
     "flask>=2.0.0",
     "python-dotenv==0.21.0",
     "click>=8.0.0",
     "sqlmodel>=0.0.19",
-    "alembic>=1.13.2"
+    "alembic>=1.13.2",
+    "gunicorn>=23.0.0",
 ]
 
 [tool.uv]

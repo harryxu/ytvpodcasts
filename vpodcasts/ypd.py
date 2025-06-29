@@ -38,11 +38,15 @@ def get_video_info(youtube_url):
 def download_audio(youtube_url):
     """Download the best quality audio and save it to the episodes directory"""
     click.echo(f"Starting audio download for {youtube_url}...")
+    audio_format = "mp3"
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
     command = [
         "yt-dlp",
-        "-f",
-        "bestaudio[ext=m4a]",
+        "-x",
+        "--audio-format",
+        audio_format,
+        "--audio-quality",
+        "5",
         "-o",
         output_template,
         youtube_url,
@@ -52,7 +56,7 @@ def download_audio(youtube_url):
         click.echo("Download completed successfully.")
         info = get_video_info(youtube_url)
         if info:
-            filename = f"{info['id']}.m4a"
+            filename = f"{info['id']}.{audio_format}"
             return filename
     except subprocess.CalledProcessError as e:
         click.echo(f"Error downloading audio: {e}", err=True)

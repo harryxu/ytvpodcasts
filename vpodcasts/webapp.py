@@ -26,12 +26,10 @@ def generate_rss_feed():
         fe = fg.add_entry()
         fe.id(episode_info.webpage_url)
         fe.title(episode_info.title)
-        upload_date_obj = datetime.strptime(episode_info.upload_date, "%Y%m%d")
-        formatted_upload_date = upload_date_obj.strftime("%Y-%m-%d")
-        description = f"{episode_info.description}<br/><br/>Webpage: {episode_info.webpage_url}<br/>Upload Date: {formatted_upload_date}"
+        description = f"{episode_info.description}<br/><br/>Webpage: {episode_info.webpage_url}<br/>Upload Date: {episode_info.upload_date}"
         fe.description(description)
-        pub_date = upload_date_obj.strftime("%a, %d %b %Y %H:%M:%S %z")
-        fe.published(pub_date + " +0000")
+        pub_date = episode_info.create_date.strftime("%a, %d %b %Y %H:%M:%S")
+        fe.published(pub_date + " GMT")
         audio_url = f"{BASE_URL}/episodes/{episode_info.audio_file}"
         fe.enclosure(
             url=audio_url,

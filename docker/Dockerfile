@@ -24,8 +24,7 @@ RUN mkdir data
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Reset the entrypoint, don't invoke `uv`
-ENTRYPOINT []
+COPY docker/start.sh .
+RUN chmod +x start.sh
 
-# Command to run the application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "vpodcasts.webapp:app"]
+ENTRYPOINT ["./start.sh"]

@@ -17,6 +17,7 @@ RUN uv sync
 COPY alembic.ini .
 COPY alembic/ ./alembic/
 COPY vpodcasts/ ./vpodcasts/
+COPY manager.py .
 
 RUN mkdir data
 

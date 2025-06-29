@@ -1,5 +1,6 @@
 *.db
 build/
+docker-compose.prod.yml
 
 # Python virtual environment
 .venv/

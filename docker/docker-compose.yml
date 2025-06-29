@@ -7,6 +7,11 @@ services:
       - "5000"
     volumes:
       - ../data:/app/data
+    environment:
+      - BASE_URL=http://localhost:8089
+      - PODCAST_TITLE=My YouTube Podcast
+      - PODCAST_DESCRIPTION=A podcast generated from YouTube videos.
+      - PODCAST_LINK=https://github.com/your_repo
 
   nginx:
     image: nginx:latest
@@ -15,5 +20,7 @@ services:
     volumes:
       - ../nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ../data:/app/data
+    environment:
+      - NGINX_SERVER_NAME=localhost
     depends_on:
       - web

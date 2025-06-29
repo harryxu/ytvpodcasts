@@ -363,7 +363,7 @@ dependencies = [
 requires-dist = [
     { name = "alembic", specifier = ">=1.13.2" },
     { name = "click", specifier = ">=8.0.0" },
-    { name = "feedgen", specifier = "==1.0.0" },
+    { name = "feedgen", specifier = ">=1.0.0" },
     { name = "flask", specifier = ">=2.0.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "lxml", specifier = "==5.4.0" },

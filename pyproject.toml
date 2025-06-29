@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A script to create podcasts from video sources."
 requires-python = ">=3.13"
 dependencies = [
-    "feedgen==1.0.0",
+    "feedgen>=1.0.0",
     "lxml==5.4.0",
     "python-dateutil==2.9.0.post0",
     "yt-dlp>=2025.6.9",

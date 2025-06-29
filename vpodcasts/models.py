@@ -1,5 +1,6 @@
 from sqlmodel import Field, SQLModel
 from typing import Optional
+from datetime import datetime, timezone
 
 
 class Episode(SQLModel, table=True):
@@ -13,3 +14,6 @@ class Episode(SQLModel, table=True):
     audio_file: Optional[str] = None
     audio_file_size: Optional[int] = None
     audio_file_type: Optional[str] = None
+    create_date: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )

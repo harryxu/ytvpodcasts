@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, Response, request
+from flask import Flask, send_from_directory, Response, request, jsonify
 from datetime import datetime
 from vpodcasts.database import get_all_episodes, create_db_and_tables
 from feedgen.feed import FeedGenerator
@@ -56,13 +56,22 @@ def download_episode(filename):
     return send_from_directory(EPISODES_DIR, filename)
 
 
-@app.route("/add", methods=["POST"])
+@app.route("/api/add", methods=["POST"])
 def add_episode():
     url = request.json.get("url")
     if not url:
-        return "Missing url", 400
+        return jsonify({"error": "Missing url"}), 400
     add_video(url)
-    return "OK", 200
+    return jsonify({"data": True}), 200
+
+
+@app.route("/api/episodes", methods=["GET"])
+def get_episodes():
+    episodes = get_all_episodes()
+    return (
+        jsonify({"data": [episode.model_dump(mode="json") for episode in episodes]}),
+        200,
+    )
 
 
 def main():

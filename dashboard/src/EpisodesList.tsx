@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material"
 import useAxios from "axios-hooks"
-import React from "react"
 import type { Episode } from "./types"
 
 export default function EpisodesList() {
@@ -40,7 +39,22 @@ export default function EpisodesList() {
                 </ListItemAvatar>
                 <ListItemText
                   primary={episode.title}
-                  secondary={episode.description}
+                  secondary={
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      title={episode.description}
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 5,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {episode.description}
+                    </Typography>
+                  }
                 />
               </ListItem>
             ))}

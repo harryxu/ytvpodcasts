@@ -16,6 +16,7 @@ dependencies = [
     "alembic>=1.13.2",
     "gunicorn>=23.0.0",
     "huey>=2.5.3",
+    "supervisor>=4.2.5",
 ]
 
 [tool.uv]

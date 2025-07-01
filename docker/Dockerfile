@@ -24,7 +24,6 @@ RUN mkdir data
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY docker/start.sh .
-RUN chmod +x start.sh
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-ENTRYPOINT ["./start.sh"]
+ENTRYPOINT ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

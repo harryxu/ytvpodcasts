@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, Response
+from flask import Flask, send_from_directory, Response, request
 from datetime import datetime
 from vpodcasts.database import get_all_episodes, create_db_and_tables
 from feedgen.feed import FeedGenerator
@@ -8,6 +8,7 @@ from vpodcasts.config import (
     PODCAST_TITLE,
     PODCAST_DESCRIPTION,
 )
+from vpodcasts.huey_tasks import add_video
 
 app = Flask(__name__)
 
@@ -53,6 +54,15 @@ def index():
 def download_episode(filename):
     # Provide the audio files
     return send_from_directory(EPISODES_DIR, filename)
+
+
+@app.route("/add", methods=["POST"])
+def add_episode():
+    url = request.json.get("url")
+    if not url:
+        return "Missing url", 400
+    add_video(url)
+    return "OK", 200
 
 
 def main():

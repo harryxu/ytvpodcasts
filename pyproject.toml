@@ -15,6 +15,7 @@ dependencies = [
     "sqlmodel>=0.0.19",
     "alembic>=1.13.2",
     "gunicorn>=23.0.0",
+    "huey>=2.5.3",
 ]
 
 [tool.uv]

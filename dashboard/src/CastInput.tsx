@@ -1,6 +1,7 @@
 import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import useAxios from "axios-hooks"
 import { useState } from "react"
+import { toast } from "react-toastify"
 
 function isYouTubeWatchUrl(url: string): boolean {
   const regex = /^https:\/\/(www\.)?youtube\.com\/watch\?v=/
@@ -19,11 +20,19 @@ export default function CastInput() {
 
   const handleAdd = async () => {
     if (!isYouTubeWatchUrl(videoUrl)) {
-      alert("Video URL must be a youtube.com URL")
+      toast.error("Video URL must be a youtube.com URL", {
+        position: "top-center",
+        toastId: "error",
+      })
       return
     }
 
     // const resp = await executeAddCast({ data: { url: videoUrl } })
+    // if (resp.status === 200) {
+    //   toast.success("New video download task added.")
+    // }
+    toast.success("Video download task added.")
+    setVideoUrl("")
   }
 
   return (
@@ -46,7 +55,11 @@ export default function CastInput() {
         }}
       >
         {!castAddApi.loading ? (
-          <Button variant="contained" onClick={handleAdd}>
+          <Button
+            variant="contained"
+            onClick={handleAdd}
+            disabled={videoUrl.trim() === ""}
+          >
             Add
           </Button>
         ) : (

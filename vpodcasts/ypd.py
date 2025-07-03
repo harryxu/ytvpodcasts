@@ -15,7 +15,7 @@ def initialize_project():
         click.echo(f"Creating directory: {EPISODES_DIR}")
         os.makedirs(EPISODES_DIR)
 
-    db.create_db_and_tables()
+    # db.create_db_and_tables()
     click.echo("Initialization complete.")
 
 

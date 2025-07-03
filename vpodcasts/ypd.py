@@ -27,15 +27,16 @@ def get_video_info(youtube_url):
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
-        click.echo(f"Error fetching video info: {e.stderr}", err=True)
-        return None
+        error_message = f"Error fetching video info: {e.stderr}"
+        click.echo(error_message, err=True)
+        raise Exception(error_message)
     except FileNotFoundError:
         click.echo("Error: 'yt-dlp' command not found.", err=True)
         click.echo("Please install yt-dlp: pip install yt-dlp", err=True)
         sys.exit(1)
 
 
-def download_audio(youtube_url):
+def download_audio(youtube_url, video_id):
     """Download the best quality audio and save it to the episodes directory"""
     click.echo(f"Starting audio download for {youtube_url}...")
     audio_format = "mp3"
@@ -52,36 +53,30 @@ def download_audio(youtube_url):
         youtube_url,
     ]
     try:
-        subprocess.run(command, check=True)
+        subprocess.run(command, check=True, capture_output=True, text=True)
         click.echo("Download completed successfully.")
-        info = get_video_info(youtube_url)
-        if info:
-            filename = f"{info['id']}.{audio_format}"
-            return filename
+        filename = f"{video_id}.{audio_format}"
+        return filename
     except subprocess.CalledProcessError as e:
-        click.echo(f"Error downloading audio: {e}", err=True)
-        return None
+        error_message = f"Error downloading audio: {e.stderr}"
+        click.echo(error_message, err=True)
+        raise Exception(error_message)
     except FileNotFoundError:
         click.echo("Error: 'yt-dlp' command not found.", err=True)
         click.echo("Please install yt-dlp: pip install yt-dlp", err=True)
         sys.exit(1)
-    return None
 
 
 def add_episode(youtube_url):
     """Handle the 'add' command: download, update database, regenerate RSS"""
     initialize_project()
     info = get_video_info(youtube_url)
-    if not info:
-        return
 
     if db.episode_exists(info["id"]):
         click.echo(f"Video '{info['title']}' already exists in the podcast. Skipping.")
         return
 
-    audio_path = download_audio(youtube_url)
-    if not audio_path:
-        return
+    audio_path = download_audio(youtube_url, info["id"])
 
     audio_file_path = os.path.join(EPISODES_DIR, audio_path)
     audio_file_size = os.path.getsize(audio_file_path)

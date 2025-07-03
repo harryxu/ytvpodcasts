@@ -27,12 +27,11 @@ export default function CastInput() {
       return
     }
 
-    // const resp = await executeAddCast({ data: { url: videoUrl } })
-    // if (resp.status === 200) {
-    //   toast.success("New video download task added.")
-    // }
-    toast.success("Video download task added.")
-    setVideoUrl("")
+    const resp = await executeAddCast({ data: { url: videoUrl } })
+    if (resp.status === 200) {
+      setVideoUrl("")
+      toast.success("Video download task added.")
+    }
   }
 
   return (

@@ -24,7 +24,7 @@ def generate_rss_feed():
     fg.language("en")
 
     for episode_info in episodes:
-        fe = fg.add_entry()
+        fe = fg.add_entry(order="append")
         fe.id(episode_info.webpage_url)
         fe.title(episode_info.title)
         description = f"{episode_info.description}<br/><br/>Webpage: {episode_info.webpage_url}<br/>Upload Date: {episode_info.upload_date}"

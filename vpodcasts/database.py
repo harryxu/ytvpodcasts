@@ -19,7 +19,7 @@ def add_episode(episode_data):
 def get_all_episodes():
     with Session(engine) as session:
         episodes = session.exec(
-            select(Episode).order_by(Episode.upload_date.desc())
+            select(Episode).order_by(Episode.create_date.desc())
         ).all()
         return episodes
 

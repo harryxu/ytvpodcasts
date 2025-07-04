@@ -12,7 +12,5 @@ devweb:
 	
 .PHONY: startdev
 startdev:
-	uv run manager.py web & \
-	uv run huey_consumer vpodcasts.huey_tasks.huey -w 1 & \
-	cd dashboard && pnpm dev & \
-	wait
+	@echo "Starting services with honcho... Press Ctrl+C to stop."
+	honcho start

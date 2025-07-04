@@ -82,7 +82,7 @@ def main():
     print(f"Serving RSS feed: {BASE_URL}/")
     print(f"Serving episodes from: ./{EPISODES_DIR}/")
     print("Press Ctrl+C to stop the server.")
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=True)
 
 
 if __name__ == "__main__":

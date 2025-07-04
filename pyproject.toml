@@ -17,6 +17,7 @@ dependencies = [
     "gunicorn>=23.0.0",
     "huey>=2.5.3",
     "supervisor>=4.2.5",
+    "honcho>=2.0.0",
 ]
 
 [tool.uv]

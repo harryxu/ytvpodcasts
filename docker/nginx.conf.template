@@ -2,11 +2,13 @@ server {
     listen 80;
     server_name ${NGINX_SERVER_NAME};
 
+    absolute_redirect off;
+
     # Set client body size to prevent errors with large audio files
     client_max_body_size 1024M;
 
     location / {
-        proxy_pass http://web:5000;
+        proxy_pass http://vpodcasts:5000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -16,5 +18,18 @@ server {
     location /episodes/ {
         alias /app/data/episodes/;
         try_files $uri =404;
+    }
+
+    location /dashboard/ {
+        root /app/data;
+        try_files $uri $uri/ /dashboard/index.html;
+        index index.html;
+    }
+    location = /dashboard {
+        return 301 /dashboard/;
+    }
+
+    location /assets/ {
+        root /app/data/dashboard;
     }
 }

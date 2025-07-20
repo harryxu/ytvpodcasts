@@ -1,8 +1,6 @@
 services:
-  web:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+  vpodcasts:
+    image: vpodcasts:latest
     expose:
       - "5000"
     volumes:
@@ -18,9 +16,9 @@ services:
     ports:
       - "8089:80"
     volumes:
-      - ../nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ../data:/app/data
     environment:
       - NGINX_SERVER_NAME=localhost
     depends_on:
-      - web
+      - vpodcasts

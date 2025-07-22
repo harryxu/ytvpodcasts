@@ -21,6 +21,14 @@ describe("isYouTubeWatchUrl", () => {
     ).toBe(true)
   })
 
+  it("should return true for URLs with extra query parameters", () => {
+    expect(
+      isYouTubeWatchUrl(
+        "https://www.youtube.com/watch?si=2XTjnM2cff5ZJv1J&v=4zyZ3sw_ulc&feature=youtu.be"
+      )
+    ).toBe(true)
+  })
+
   it("should return false for non-youtube URLs", () => {
     expect(isYouTubeWatchUrl("https://www.google.com")).toBe(false)
     expect(isYouTubeWatchUrl("https://vimeo.com/12345678")).toBe(false)

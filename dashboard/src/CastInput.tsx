@@ -2,11 +2,7 @@ import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import useAxios from "axios-hooks"
 import { useState } from "react"
 import { toast } from "react-toastify"
-
-function isYouTubeWatchUrl(url: string): boolean {
-  const regex = /^https:\/\/(www\.)?youtube\.com\/watch\?v=/
-  return regex.test(url)
-}
+import { isYouTubeWatchUrl } from "./utils"
 
 export default function CastInput() {
   const [videoUrl, setVideoUrl] = useState("")

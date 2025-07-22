@@ -1,4 +1,6 @@
-# Gemini Project Workflow: Git Commit
+# GEMINI.md for VPodcasts project.
+
+## Gemini Project Workflow: Git Commit
 
 **Objective:** To automate the process of creating a Git commit based on the current file changes.
 
@@ -15,3 +17,18 @@
 
 ## Gemini Added Memories
 - use uv to install python dependencies
+
+## Directory: `dashboard/`
+
+This directory contains the source code for the podcast's web administration interface.
+
+### Technology Stack
+
+*   **Framework/Library**: React.js
+*   **UI Components**: Material-UI (MUI)
+*   **Package Manager**: pnpm
+
+### Testing
+
+*   **Testing Framework**: Vitest
+*   **Test Code Location**: All frontend tests are located within the `dashboard/src/__tests__/` directory. When generating new tests, please place them here.

@@ -22,7 +22,7 @@ devweb:
 startdev:
 	# Run all services with honcho from Procfile on development environment.
 	@echo "Starting services with honcho... Press Ctrl+C to stop."
-	honcho start
+	uv run honcho start
 
 
 .PHONY: run-docker

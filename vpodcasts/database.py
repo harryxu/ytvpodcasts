@@ -24,6 +24,26 @@ def get_all_episodes():
         return episodes
 
 
+def get_episodes(page: int = 1, per_page: int = 10):
+    with Session(engine) as session:
+        offset = (page - 1) * per_page
+        episodes = session.exec(
+            select(Episode)
+            .order_by(Episode.create_date.desc())
+            .offset(offset)
+            .limit(per_page)
+        ).all()
+        return episodes
+
+
 def episode_exists(video_id):
     with Session(engine) as session:
         return session.get(Episode, video_id) is not None
+
+
+def delete_episode(video_id: str):
+    with Session(engine) as session:
+        episode = session.get(Episode, video_id)
+        if episode:
+            session.delete(episode)
+            session.commit()

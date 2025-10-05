@@ -1,4 +1,4 @@
-from sqlmodel import create_engine, SQLModel, Session, select
+from sqlmodel import create_engine, SQLModel, Session, select, func
 from vpodcasts.models import Episode
 from vpodcasts.config import DB_FILE
 
@@ -27,13 +27,17 @@ def get_all_episodes():
 def get_episodes(page: int = 1, per_page: int = 10):
     with Session(engine) as session:
         offset = (page - 1) * per_page
+
+        count_statement = select(func.count()).select_from(Episode)
+        total_count = session.exec(count_statement).one()
+
         episodes = session.exec(
             select(Episode)
             .order_by(Episode.create_date.desc())
             .offset(offset)
             .limit(per_page)
         ).all()
-        return episodes
+        return episodes, total_count
 
 
 def episode_exists(video_id):

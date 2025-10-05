@@ -7,7 +7,7 @@ dependencies = [
     "feedgen>=1.0.0",
     "lxml==5.4.0",
     "python-dateutil==2.9.0.post0",
-    "yt-dlp>=2025.6.9",
+    "yt-dlp>=2025.9.26",
     "six>=1.17.0",
     "flask>=2.0.0",
     "python-dotenv==0.21.0",

@@ -1,9 +1,14 @@
+import math
 import flask
 from feedgen.feed import FeedGenerator
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
-from vpodcasts.database import create_db_and_tables, get_all_episodes
+from vpodcasts.database import (
+    create_db_and_tables,
+    get_all_episodes,
+    get_episodes as db_get_episodes,
+)
 from vpodcasts.huey_tasks import add_video
 
 app = Flask(__name__)
@@ -38,9 +43,22 @@ def add_episode():
 
 @app.route("/api/episodes", methods=["GET"])
 def get_episodes():
-    episodes = get_all_episodes()
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+    episodes, total_items = db_get_episodes(page=page, per_page=per_page)
+    total_pages = math.ceil(total_items / per_page)
     return (
-        jsonify({"data": [episode.model_dump(mode="json") for episode in episodes]}),
+        jsonify(
+            {
+                "data": [episode.model_dump(mode="json") for episode in episodes],
+                "pagination": {
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": total_pages,
+                    "total_items": total_items,
+                },
+            }
+        ),
         200,
     )
 

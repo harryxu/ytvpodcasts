@@ -6,25 +6,37 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Pagination,
   Skeleton,
   Typography,
 } from "@mui/material"
 import useAxios from "axios-hooks"
-import type { Episode } from "./types"
+import type { Episode, EpisodesResponse } from "./types"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
+import { useEffect, useState } from "react"
 
 export default function EpisodesList() {
-  const [episodesApi, refetch] = useAxios({
-    url: "/api/episodes",
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const episodesQuery = useQuery({
+    queryKey: ["episodes", currentPage],
+    queryFn: async (): Promise<EpisodesResponse> => {
+      const res = await axios.get("/api/episodes", {
+        params: { page: currentPage, per_page: 5 },
+      })
+      return res.data
+    },
   })
 
   return (
     <Card variant="outlined">
       <CardContent>
         <Typography variant="h5">Episodes</Typography>
-        {episodesApi.loading && <Skeleton />}
-        {episodesApi.data && (
+        {episodesQuery.isPending && <Skeleton />}
+        {episodesQuery.data && (
           <List>
-            {episodesApi.data.data.map((episode: Episode) => (
+            {episodesQuery.data.data.map(episode => (
               <ListItem
                 key={episode.id}
                 alignItems="flex-start"
@@ -60,6 +72,11 @@ export default function EpisodesList() {
             ))}
           </List>
         )}
+        <Pagination
+          count={episodesQuery.data?.pagination?.total_pages ?? 0}
+          page={currentPage}
+          onChange={(_, page) => setCurrentPage(page)}
+        />
       </CardContent>
     </Card>
   )

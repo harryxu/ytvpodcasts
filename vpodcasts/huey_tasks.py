@@ -7,5 +7,5 @@ huey = SqliteHuey(filename=DB_FILE)
 
 
 @huey.task()
-def add_video(youtube_url):
+def add_video(youtube_url: str):
     add_episode(youtube_url)

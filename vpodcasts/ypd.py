@@ -19,7 +19,7 @@ def initialize_project():
     click.echo("Initialization complete.")
 
 
-def get_video_info(youtube_url):
+def get_video_info(youtube_url: str):
     """Get video metadata using yt-dlp"""
     click.echo(f"Fetching metadata for {youtube_url}...")
     command = ["yt-dlp", "--dump-json", youtube_url]
@@ -36,7 +36,7 @@ def get_video_info(youtube_url):
         sys.exit(1)
 
 
-def download_audio(youtube_url, video_id):
+def download_audio(youtube_url: str, video_id: str):
     """Download the best quality audio and save it to the episodes directory"""
     click.echo(f"Starting audio download for {youtube_url}...")
     audio_format = "mp3"
@@ -67,7 +67,7 @@ def download_audio(youtube_url, video_id):
         sys.exit(1)
 
 
-def add_episode(youtube_url):
+def add_episode(youtube_url: str):
     """Handle the 'add' command: download, update database, regenerate RSS"""
     initialize_project()
     info = get_video_info(youtube_url)

@@ -1,4 +1,5 @@
-from sqlmodel import Field, SQLModel
+from typing import Literal
+from sqlmodel import Field, SQLModel, String
 from datetime import datetime, timezone
 import sqlalchemy as sa
 
@@ -26,7 +27,9 @@ class DownloadTask(SQLModel, table=True):
     queue_task_id: str = Field(max_length=100)
     title: str = Field(max_length=100)
     description: str | None = None
-    status: str = Field(max_length=50)
+    status: Literal["pending", "processing", "success", "failed"] = Field(
+        default="pending", sa_type=String
+    )
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),

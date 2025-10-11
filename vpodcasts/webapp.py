@@ -9,7 +9,7 @@ from vpodcasts.database import (
     get_all_episodes,
     get_episodes as db_get_episodes,
 )
-from vpodcasts.huey_tasks import add_video
+from vpodcasts.huey_tasks import create_video_download_task
 
 app = Flask(__name__)
 
@@ -27,7 +27,7 @@ def rss():
 
 
 @app.route("/episodes/<path:filename>")
-def download_episode(filename):
+def download_episode(filename: str):
     # Provide the audio files
     return send_from_directory(EPISODES_DIR, filename)
 
@@ -37,7 +37,7 @@ def add_episode():
     url = request.json.get("url")
     if not url:
         return jsonify({"error": "Missing url"}), 400
-    add_video(url)
+    create_video_download_task(url)
     return jsonify({"data": True}), 200
 
 

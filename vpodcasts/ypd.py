@@ -121,7 +121,7 @@ def init():
 
 @cli.command()
 @click.argument("url")
-def add(url):
+def add(url: str):
     """Add a new YouTube video to the podcast."""
     add_episode(url)
 

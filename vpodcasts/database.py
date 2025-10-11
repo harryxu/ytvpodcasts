@@ -1,3 +1,4 @@
+from typing import Any
 from sqlmodel import create_engine, SQLModel, Session, select, func
 from vpodcasts.models import Episode
 from vpodcasts.config import DB_FILE
@@ -9,7 +10,7 @@ def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
 
-def add_episode(episode_data):
+def add_episode(episode_data: dict[str, Any]):
     with Session(engine) as session:
         episode = Episode(**episode_data)
         session.add(episode)
@@ -40,7 +41,7 @@ def get_episodes(page: int = 1, per_page: int = 10):
         return episodes, total_count
 
 
-def episode_exists(video_id):
+def episode_exists(video_id: str):
     with Session(engine) as session:
         return session.get(Episode, video_id) is not None
 

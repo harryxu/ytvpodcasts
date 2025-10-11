@@ -19,14 +19,15 @@ def _handle_download_complete(signal, task: Task, exc=None):
 
 @huey.signal(SIGNAL_ERROR)
 def _handle_download_error(signal, task: Task, exc=None):
-    print(f"Download task {task.id} failed. {exc}")
     with Session(db.engine) as session:
         download_task = session.exec(
             select(DownloadTask).where(DownloadTask.queue_task_id == task.id)
         ).first()
-        download_task.status = "failed"
-        session.add(download_task)
-        session.commit()
+        if download_task:
+            download_task.status = "failed"
+            download_task.description = str(exc)
+            session.add(download_task)
+            session.commit()
 
 
 @huey.task()

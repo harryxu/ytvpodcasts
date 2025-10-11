@@ -1,6 +1,6 @@
 from typing import Any
 from sqlmodel import create_engine, SQLModel, Session, select, func
-from vpodcasts.models import Episode
+from vpodcasts.models import DownloadTask, Episode
 from vpodcasts.config import DB_FILE
 
 engine = create_engine(f"sqlite:///{DB_FILE}")

@@ -105,6 +105,7 @@ def add_episode(youtube_url: str):
 
     db.add_episode(episode_data)
     click.echo(f"Added '{info['title']}' to the database.")
+    return episode_data
 
 
 @click.group()

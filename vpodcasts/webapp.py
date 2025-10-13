@@ -4,11 +4,7 @@ from feedgen.feed import FeedGenerator
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
-from vpodcasts.database import (
-    create_db_and_tables,
-    get_all_episodes,
-    get_episodes as db_get_episodes,
-)
+import vpodcasts.database as db
 from vpodcasts.huey_tasks import create_video_download_task
 
 app = Flask(__name__)
@@ -45,7 +41,7 @@ def add_episode():
 def get_episodes():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    episodes, total_items = db_get_episodes(page=page, per_page=per_page)
+    episodes, total_items = db.get_episodes(page=page, per_page=per_page)
     total_pages = math.ceil(total_items / per_page)
     return (
         jsonify(
@@ -63,8 +59,33 @@ def get_episodes():
     )
 
 
+@app.route("/api/tasks", methods=["GET"])
+def get_tasks():
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+    tasks, total_items = db.get_download_tasks(page=page, per_page=per_page)
+    total_pages = math.ceil(total_items / per_page)
+    return (
+        jsonify(
+            {
+                "data": [
+                    task.model_dump(mode="json", exclude={"queue_task_id"})
+                    for task in tasks
+                ],
+                "pagination": {
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": total_pages,
+                    "total_items": total_items,
+                },
+            }
+        ),
+        200,
+    )
+
+
 def generate_rss_feed():
-    episodes = get_all_episodes()
+    episodes = db.get_all_episodes()
 
     fg = FeedGenerator()
     fg.load_extension("podcast")
@@ -95,7 +116,7 @@ def generate_rss_feed():
 
 def main():
     """Main function, starts the server"""
-    create_db_and_tables()  # Ensure database and tables are created
+    db.create_db_and_tables()  # Ensure database and tables are created
     port = 8000
     print(f"Starting Flask server at http://localhost:{port}")
     print(f"Serving RSS feed: {BASE_URL}/")

@@ -52,3 +52,22 @@ def delete_episode(video_id: str):
         if episode:
             session.delete(episode)
             session.commit()
+
+
+def get_download_tasks(page: int = 1, per_page: int = 10, status: str | None = None):
+    with Session(engine) as session:
+        offset = (page - 1) * per_page
+
+        count_statement = select(func.count()).select_from(DownloadTask)
+        total_count = session.exec(count_statement).one()
+
+        statement = (
+            select(DownloadTask)
+            .order_by(DownloadTask.updated_at.desc())
+            .offset(offset)
+            .limit(per_page)
+        )
+        if status:
+            statement = statement.where(DownloadTask.status == status)
+        download_tasks = session.exec(statement).all()
+        return download_tasks, total_count

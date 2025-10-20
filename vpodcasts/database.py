@@ -1,3 +1,5 @@
+# pyright: reportAttributeAccessIssue=false
+
 from typing import Any
 from sqlmodel import create_engine, SQLModel, Session, select, func
 from vpodcasts.models import DownloadTask, Episode
@@ -58,8 +60,12 @@ def get_download_tasks(page: int = 1, per_page: int = 10, status: str | None = N
     with Session(engine) as session:
         offset = (page - 1) * per_page
 
-        count_statement = select(func.count()).select_from(DownloadTask)
-        total_count = session.exec(count_statement).one()
+        total_count = session.exec(select(func.count()).select_from(DownloadTask)).one()
+        notify_count = session.exec(
+            select(func.count())
+            .select_from(DownloadTask)
+            .where(DownloadTask.status.in_(["pending", "processing", "failed"]))
+        ).one()
 
         statement = (
             select(DownloadTask)
@@ -70,4 +76,4 @@ def get_download_tasks(page: int = 1, per_page: int = 10, status: str | None = N
         if status:
             statement = statement.where(DownloadTask.status == status)
         download_tasks = session.exec(statement).all()
-        return download_tasks, total_count
+        return download_tasks, total_count, notify_count

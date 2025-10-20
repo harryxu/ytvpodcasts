@@ -63,7 +63,9 @@ def get_episodes():
 def get_tasks():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    tasks, total_items = db.get_download_tasks(page=page, per_page=per_page)
+    tasks, total_items, notify_count = db.get_download_tasks(
+        page=page, per_page=per_page
+    )
     total_pages = math.ceil(total_items / per_page)
     return (
         jsonify(
@@ -78,6 +80,7 @@ def get_tasks():
                     "total_pages": total_pages,
                     "total_items": total_items,
                 },
+                "notify_count": notify_count,
             }
         ),
         200,

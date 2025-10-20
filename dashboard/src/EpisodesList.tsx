@@ -10,11 +10,10 @@ import {
   Skeleton,
   Typography,
 } from "@mui/material"
-import useAxios from "axios-hooks"
-import type { Episode, EpisodesResponse } from "./types"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import type { EpisodesResponse } from "./types"
 
 export default function EpisodesList() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -32,7 +31,6 @@ export default function EpisodesList() {
   return (
     <Card variant="outlined">
       <CardContent>
-        <Typography variant="h5">Episodes</Typography>
         {episodesQuery.isPending && <Skeleton />}
         {episodesQuery.data && (
           <List>

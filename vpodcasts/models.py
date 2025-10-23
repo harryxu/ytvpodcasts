@@ -30,6 +30,7 @@ class DownloadTask(SQLModel, table=True):
     status: Literal["pending", "processing", "success", "failed"] = Field(
         default="pending", sa_type=String
     )
+    is_unread: bool | None = Field(default=None)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),

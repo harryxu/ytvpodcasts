@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import * as React from "react"
 import type { DownloadTaskResponse } from "./types"
 
 const TaskList = () => {

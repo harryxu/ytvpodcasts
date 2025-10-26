@@ -2,7 +2,7 @@
 name = "vpodcasts"
 version = "0.1.0"
 description = "YouTube as Podcast"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 dependencies = [
     "feedgen>=1.0.0",
     "lxml==5.4.0",

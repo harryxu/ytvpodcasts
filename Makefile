@@ -17,13 +17,16 @@ huey:
 .PHONY: devweb
 devweb:
 	un run manager.py web
-	
+
 .PHONY: startdev
-startdev:
+startdev: migratedb
 	# Run all services with honcho from Procfile on development environment.
 	@echo "Starting services with honcho... Press Ctrl+C to stop."
 	uv run honcho start
 
+.PHONY: migratedb
+	@echo "Starting database migration..."
+	uv run alembic upgrade head
 
 .PHONY: run-docker
 run-docker:

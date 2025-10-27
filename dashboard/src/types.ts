@@ -36,7 +36,7 @@ export interface DownloadTask {
 }
 
 export interface DownloadTaskResponse {
-  data: DownloadTask
+  data: DownloadTask[]
   notify_count: number
   pagination: Pagination
 }

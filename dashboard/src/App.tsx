@@ -24,10 +24,10 @@ function App() {
               <Tab label="Episodes" value="1" />
               <Tab label="Tasks" value="2" />
             </TabList>
-            <TabPanel value="1">
+            <TabPanel value="1" keepMounted>
               <EpisodesList />
             </TabPanel>
-            <TabPanel value="2">
+            <TabPanel value="2" keepMounted>
               <TaskList />
             </TabPanel>
           </TabContext>

@@ -1,90 +1,81 @@
 import math
-import flask
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import Response, FileResponse
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from feedgen.feed import FeedGenerator
-from flask import Flask, Response, jsonify, request, send_from_directory
 
 from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
 import vpodcasts.database as db
 from vpodcasts.huey_tasks import create_video_download_task
 
-app = Flask(__name__)
+app = FastAPI()
+templates = Jinja2Templates(directory="vpodcasts/templates")
 
 
-@app.route("/")
-def index():
-    return flask.render_template("index.html")
+@app.get("/")
+def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.route("/rss")
+@app.get("/rss")
 def rss():
     # Provide the RSS feed dynamically
     rss_feed = generate_rss_feed()
-    return Response(rss_feed, mimetype="application/xml")
+    return Response(content=rss_feed, media_type="application/xml")
 
 
-@app.route("/episodes/<path:filename>")
+@app.get("/episodes/{filename:path}")
 def download_episode(filename: str):
     # Provide the audio files
-    return send_from_directory(EPISODES_DIR, filename)
+    return FileResponse(f"{EPISODES_DIR}/{filename}")
 
 
-@app.route("/api/add", methods=["POST"])
-def add_episode():
-    url = request.json.get("url")
-    if not url:
-        return jsonify({"error": "Missing url"}), 400
-    create_video_download_task(url)
-    return jsonify({"data": True}), 200
+class AddEpisodePayload(BaseModel):
+    url: str
 
 
-@app.route("/api/episodes", methods=["GET"])
-def get_episodes():
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+@app.post("/api/add")
+def add_episode(payload: AddEpisodePayload):
+    if not payload.url:
+        raise HTTPException(status_code=400, detail="Missing url")
+    create_video_download_task(payload.url)
+    return {"data": True}
+
+
+@app.get("/api/episodes")
+def get_episodes(page: int = 1, per_page: int = 10):
     episodes, total_items = db.get_episodes(page=page, per_page=per_page)
     total_pages = math.ceil(total_items / per_page)
-    return (
-        jsonify(
-            {
-                "data": [episode.model_dump(mode="json") for episode in episodes],
-                "pagination": {
-                    "page": page,
-                    "per_page": per_page,
-                    "total_pages": total_pages,
-                    "total_items": total_items,
-                },
-            }
-        ),
-        200,
-    )
+    return {
+        "data": [episode.model_dump(mode="json") for episode in episodes],
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "total_items": total_items,
+        },
+    }
 
 
-@app.route("/api/tasks", methods=["GET"])
-def get_tasks():
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+@app.get("/api/tasks")
+def get_tasks(page: int = 1, per_page: int = 10):
     tasks, total_items, notify_count = db.get_download_tasks(
         page=page, per_page=per_page
     )
     total_pages = math.ceil(total_items / per_page)
-    return (
-        jsonify(
-            {
-                "data": [
-                    task.model_dump(mode="json", exclude={"queue_task_id"})
-                    for task in tasks
-                ],
-                "pagination": {
-                    "page": page,
-                    "per_page": per_page,
-                    "total_pages": total_pages,
-                    "total_items": total_items,
-                },
-                "notify_count": notify_count,
-            }
-        ),
-        200,
-    )
+    return {
+        "data": [
+            task.model_dump(mode="json", exclude={"queue_task_id"}) for task in tasks
+        ],
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "total_items": total_items,
+        },
+        "notify_count": notify_count,
+    }
 
 
 def generate_rss_feed():
@@ -115,18 +106,3 @@ def generate_rss_feed():
             fe.podcast.itunes_duration(episode_info.duration)
 
     return fg.rss_str(pretty=True)
-
-
-def main():
-    """Main function, starts the server"""
-    db.create_db_and_tables()  # Ensure database and tables are created
-    port = 8000
-    print(f"Starting Flask server at http://localhost:{port}")
-    print(f"Serving RSS feed: {BASE_URL}/")
-    print(f"Serving episodes from: ./{EPISODES_DIR}/")
-    print("Press Ctrl+C to stop the server.")
-    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=True)
-
-
-if __name__ == "__main__":
-    main()

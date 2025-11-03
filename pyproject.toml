@@ -9,15 +9,14 @@ dependencies = [
     "python-dateutil==2.9.0.post0",
     "yt-dlp>=2025.9.26",
     "six>=1.17.0",
-    "flask>=2.0.0",
     "python-dotenv==0.21.0",
     "click>=8.0.0",
-    "gunicorn>=23.0.0",
     "supervisor>=4.2.5",
     "honcho>=2.0.0",
     "sqlmodel>=0.0.25",
     "alembic>=1.16.5",
     "huey>=2.5.3",
+    "fastapi[standard]>=0.121.0",
 ]
 
 [tool.uv]

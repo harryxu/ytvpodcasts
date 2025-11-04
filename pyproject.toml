@@ -18,6 +18,8 @@ dependencies = [
     "huey>=2.5.3",
     "fastapi[standard]>=0.121.0",
     "uvicorn[standard]>=0.38.0",
+    "uvloop>=0.22.1",
+    "httptools>=0.7.1",
 ]
 
 [tool.uv]

@@ -1,7 +1,3 @@
-.PHONY: docker
-docker:
-	docker build -f docker/Dockerfile -t vpodcasts:latest .
-
 .PHONY: dashboard
 dashboard:
 	cd dashboard && pnpm run build
@@ -27,6 +23,10 @@ startdev: migratedb
 .PHONY: migratedb
 	@echo "Starting database migration..."
 	uv run alembic upgrade head
+
+.PHONY: docker
+docker:
+	docker build -f docker/Dockerfile -t vpodcasts:latest .
 
 .PHONY: run-docker
 run-docker:

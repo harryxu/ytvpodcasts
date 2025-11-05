@@ -22,3 +22,5 @@ PODCAST_DESCRIPTION = os.getenv(
     "PODCAST_DESCRIPTION", "A podcast generated from YouTube videos."
 )
 PODCAST_LINK = os.getenv("PODCAST_LINK", "https://github.com/your_repo")
+
+YOUTUBE_COOKIES_FILE = os.getenv("YOUTUBE_COOKIES_FILE")

@@ -6,7 +6,7 @@ import sys
 import click
 
 import vpodcasts.database as db
-from vpodcasts.config import EPISODES_DIR
+from vpodcasts.config import EPISODES_DIR, YOUTUBE_COOKIES_FILE
 
 
 def initialize_project():
@@ -21,9 +21,9 @@ def initialize_project():
 
 def get_video_info(youtube_url: str):
     """Get video metadata using yt-dlp"""
-    click.echo(f"Fetching metadata for {youtube_url}...")
-    command = ["yt-dlp", "--dump-json", youtube_url]
+    command = create_ytdlp_command(["yt-dlp", "--dump-json"], youtube_url)
     try:
+        click.echo(f"Fetching metadata for {youtube_url} with command {command}")
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
@@ -38,21 +38,23 @@ def get_video_info(youtube_url: str):
 
 def download_audio(youtube_url: str, video_id: str):
     """Download the best quality audio and save it to the episodes directory"""
-    click.echo(f"Starting audio download for {youtube_url}...")
     audio_format = "mp3"
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
-    command = [
-        "yt-dlp",
-        "-x",
-        "--audio-format",
-        audio_format,
-        "--audio-quality",
-        "5",
-        "-o",
-        output_template,
+    command = create_ytdlp_command(
+        [
+            "yt-dlp",
+            "-x",
+            "--audio-format",
+            audio_format,
+            "--audio-quality",
+            "5",
+            "-o",
+            output_template,
+        ],
         youtube_url,
-    ]
+    )
     try:
+        click.echo(f"Starting audio download for {youtube_url} with command: {command}")
         subprocess.run(command, check=True, capture_output=True, text=True)
         click.echo("Download completed successfully.")
         filename = f"{video_id}.{audio_format}"
@@ -106,6 +108,13 @@ def add_episode(youtube_url: str):
     db.add_episode(episode_data)
     click.echo(f"Added '{info['title']}' to the database.")
     return episode_data
+
+
+def create_ytdlp_command(command: list[str], youtube_url: str):
+    if YOUTUBE_COOKIES_FILE:
+        command += ["--cookies", YOUTUBE_COOKIES_FILE]
+    command.append(youtube_url)
+    return command
 
 
 @click.group()

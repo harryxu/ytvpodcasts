@@ -13,9 +13,14 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { useState } from "react"
-import type { EpisodesResponse } from "./types"
+import type { EpisodesResponse } from "../types"
+import { createFileRoute } from "@tanstack/react-router"
 
-export default function EpisodesList() {
+export const Route = createFileRoute("/")({
+  component: EpisodesList,
+})
+
+function EpisodesList() {
   const [currentPage, setCurrentPage] = useState(1)
 
   const episodesQuery = useQuery({

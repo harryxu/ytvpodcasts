@@ -10,13 +10,18 @@ import {
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import type { DownloadTaskResponse } from "./types"
+import type { DownloadTaskResponse } from "../types"
 
 import { CancelOutlined, CheckCircleOutlined } from "@mui/icons-material"
+import { createFileRoute } from "@tanstack/react-router"
 
-const TaskList = () => {
+export const Route = createFileRoute("/tasks")({
+  component: TaskList,
+})
+
+function TaskList() {
   const tasksQuery = useQuery({
-    queryKey: [],
+    queryKey: ["tasks"],
     queryFn: async (): Promise<DownloadTaskResponse> => {
       const res = await axios.get("/api/tasks", {
         params: { page: 1, per_page: 10 },
@@ -24,6 +29,8 @@ const TaskList = () => {
       return res.data
     },
   })
+
+  if (tasksQuery.isLoading) return <CircularProgress />
 
   return (
     <Card variant="outlined">
@@ -58,5 +65,3 @@ const TaskList = () => {
     </Card>
   )
 }
-
-export default TaskList

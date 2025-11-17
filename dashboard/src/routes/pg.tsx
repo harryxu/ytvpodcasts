@@ -9,8 +9,9 @@ import {
   Typography,
 } from "@mui/material"
 
-import { CancelOutlined, CheckCircleOutlined } from "@mui/icons-material"
 import { createFileRoute } from "@tanstack/react-router"
+import { CircleX, CircleCheck } from 'lucide-react';
+
 
 export const Route = createFileRoute("/pg")({
   component: Pg,
@@ -52,9 +53,9 @@ function Pg() {
             <ListItem key={item.id} alignItems="flex-start">
               <ListItemIcon>
                 {item.status === "success" && (
-                  <CheckCircleOutlined color="success" />
+                  <CircleCheck color="green" />
                 )}
-                {item.status === "failed" && <CancelOutlined color="error" />}
+                {item.status === "failed" && <CircleX color="red" />}
                 {(item.status === "pending" ||
                   item.status === "processing") && (
                   <CircularProgress size={22} enableTrackSlot />

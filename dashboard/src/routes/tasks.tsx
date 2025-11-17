@@ -10,9 +10,9 @@ import {
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
+import { CircleCheck, CircleX } from "lucide-react"
 import type { DownloadTaskResponse } from "../types"
 
-import { CancelOutlined, CheckCircleOutlined } from "@mui/icons-material"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/tasks")({
@@ -40,10 +40,8 @@ function TaskList() {
             {tasksQuery.data.data.map(item => (
               <ListItem key={item.id} alignItems="flex-start">
                 <ListItemIcon>
-                  {item.status === "success" && (
-                    <CheckCircleOutlined color="success" />
-                  )}
-                  {item.status === "failed" && <CancelOutlined color="error" />}
+                  {item.status === "success" && <CircleCheck color="green" />}
+                  {item.status === "failed" && <CircleX color="red" />}
                   {(item.status === "pending" ||
                     item.status === "processing") && (
                     <CircularProgress size={22} enableTrackSlot />

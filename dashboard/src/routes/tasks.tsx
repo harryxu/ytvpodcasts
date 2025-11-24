@@ -8,22 +8,28 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material"
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
 import { CircleCheck, CircleX } from "lucide-react"
-import type { DownloadTaskResponse } from "../types"
 
 import { createFileRoute } from "@tanstack/react-router"
 import { useDownloadTasksQuery } from "../api"
 import { useTaskStore } from "../stores"
+import { useEffect } from "react"
 
 export const Route = createFileRoute("/tasks")({
   component: TaskList,
 })
 
 function TaskList() {
-  const tasksQuery = useDownloadTasksQuery()
+  const tasksQuery = useDownloadTasksQuery(false)
   const taskStore = useTaskStore()
+  const setAllowAutoUpdate = taskStore.setAllowAutoUpdate
+
+  useEffect(() => {
+    setAllowAutoUpdate(false)
+    return () => {
+      setAllowAutoUpdate(true)
+    }
+  }, [setAllowAutoUpdate])
 
   if (tasksQuery.isLoading) return <CircularProgress />
 

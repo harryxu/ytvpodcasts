@@ -1,7 +1,7 @@
-import { useTaskStore } from "../stores"
+import { useDownloadTasksQuery } from "../api"
 
 export default function TaskUpdater() {
-  const taskStore = useTaskStore()
+  const taskQuery = useDownloadTasksQuery()
 
   return null
 }

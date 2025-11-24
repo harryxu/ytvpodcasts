@@ -11,6 +11,7 @@ import { useState } from "react"
 import CastInput from "../CastInput"
 import ToastContainer from "../components/toastify"
 import "../App.css"
+import TaskUpdater from "../components/TaskUpdater"
 
 export const Route = createRootRoute({
   component: App,
@@ -49,6 +50,7 @@ function App() {
           <Outlet />
         </Stack>
       </Container>
+      <TaskUpdater />
       <ToastContainer />
       <TanStackRouterDevtools />
     </>

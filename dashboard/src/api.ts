@@ -4,8 +4,8 @@ import type { DownloadTaskResponse } from "./types"
 import { useEffect } from "react"
 import { useTaskStore } from "./stores"
 
-export const useDownloadTasksQuery = () => {
-  const taskStore = useTaskStore()
+export const useDownloadTasksQuery = (enabled: boolean = true) => {
+  const { setTasks, allowAutoUpdate } = useTaskStore()
   const tasksQuery = useQuery({
     queryKey: ["tasks"],
     queryFn: async (): Promise<DownloadTaskResponse> => {
@@ -14,14 +14,15 @@ export const useDownloadTasksQuery = () => {
       })
       return res.data
     },
-    enabled: false,
+    enabled,
+    refetchInterval: allowAutoUpdate ? 300 * 1000 : false,
   })
 
   useEffect(() => {
     if (!tasksQuery.isFetching && tasksQuery.data) {
-      taskStore.setTasks(tasksQuery.data)
+      setTasks(tasksQuery.data)
     }
-  }, [tasksQuery.isFetching, tasksQuery.data, taskStore])
+  }, [tasksQuery.isFetching, tasksQuery.data, setTasks])
 
   return tasksQuery
 }

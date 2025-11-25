@@ -12,6 +12,7 @@ import CastInput from "../CastInput"
 import ToastContainer from "../components/toastify"
 import "../App.css"
 import TaskUpdater from "../components/TaskUpdater"
+import { Rss } from "lucide-react"
 
 export const Route = createRootRoute({
   component: App,
@@ -39,7 +40,12 @@ function App() {
   return (
     <>
       <Container>
-        <h1>VPodcasts</h1>
+        <h1>
+          VPodcasts
+          <a href="/rss" target="_blank">
+            <Rss color="orange" />
+          </a>
+        </h1>
         <Stack spacing={5}>
           <CastInput />
           <Tabs value={tabValue} onChange={handleTabChange}>

@@ -45,7 +45,6 @@ function App() {
           <Tabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Episodes" value="/" />
             <Tab label="Tasks" value="/tasks" />
-            <Tab label="PG" value="/pg" />
           </Tabs>
           <Outlet />
         </Stack>

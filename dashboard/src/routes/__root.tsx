@@ -11,7 +11,7 @@ import { useState } from "react"
 import CastInput from "../CastInput"
 import ToastContainer from "../components/toastify"
 import "../App.css"
-import TaskUpdater from "../components/TaskUpdater"
+import TaskUpdater from "../components/taskUpdater"
 import { Rss } from "lucide-react"
 
 export const Route = createRootRoute({

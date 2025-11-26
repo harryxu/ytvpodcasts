@@ -8,7 +8,9 @@ import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { routeTree } from "./routeTree.gen"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-const router = createRouter({ routeTree })
+const basepath = import.meta.env.PROD ? "/dashboard" : "/"
+
+const router = createRouter({ routeTree, basepath })
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -26,5 +28,5 @@ createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} />
       </QueryClientProvider>
     </ThemeProvider>
-  </StrictMode>,
+  </StrictMode>
 )

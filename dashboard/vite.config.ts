@@ -15,7 +15,11 @@ export default defineConfig({
     port: 5180,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:5000",
+        target: "http://127.0.0.1:5080",
+        changeOrigin: true,
+      },
+      "/rss": {
+        target: "http://127.0.0.1:5080",
         changeOrigin: true,
       },
     },

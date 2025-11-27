@@ -2,19 +2,23 @@ import {
   Avatar,
   Card,
   CardContent,
+  colors,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Pagination,
   Skeleton,
+  Stack,
   Typography,
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { useState } from "react"
-import type { EpisodesResponse } from "../types"
+import type { Episode, EpisodesResponse } from "../types"
 import { createFileRoute } from "@tanstack/react-router"
+import { Play, PlayCircle } from "lucide-react"
 
 export const Route = createFileRoute("/")({
   component: EpisodesList,
@@ -40,38 +44,7 @@ function EpisodesList() {
         {episodesQuery.data && (
           <List>
             {episodesQuery.data.data.map(episode => (
-              <ListItem
-                key={episode.id}
-                alignItems="flex-start"
-                sx={{ gap: 2 }}
-              >
-                <ListItemAvatar>
-                  <Avatar
-                    alt={episode.title}
-                    src={episode.thumbnail}
-                    sx={{ width: 64, height: 64 }}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={episode.title}
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      title={episode.description}
-                      sx={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 5,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {episode.description}
-                    </Typography>
-                  }
-                />
-              </ListItem>
+              <EpisodeItem key={episode.id} episode={episode} />
             ))}
           </List>
         )}
@@ -82,5 +55,45 @@ function EpisodesList() {
         />
       </CardContent>
     </Card>
+  )
+}
+
+const EpisodeItem = ({ episode }: { episode: Episode }) => {
+  const headContent = (
+    <Stack direction="row" alignItems="center" gap={0.5}>
+      <PlayCircle size={15} color={colors.grey[500]} />
+      <Typography sx={{ fontSize: "1.2rem" }}>{episode.title}</Typography>
+    </Stack>
+  )
+
+  return (
+    <ListItem alignItems="flex-start" sx={{ gap: 2 }}>
+      <ListItemAvatar>
+        <Avatar
+          alt={episode.title}
+          src={episode.thumbnail}
+          sx={{ width: 64, height: 64 }}
+        />
+      </ListItemAvatar>
+      <ListItemText
+        primary={headContent}
+        secondary={
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            title={episode.description}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 5,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {episode.description}
+          </Typography>
+        }
+      />
+    </ListItem>
   )
 }

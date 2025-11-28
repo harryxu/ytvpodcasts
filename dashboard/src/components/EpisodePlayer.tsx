@@ -1,25 +1,52 @@
+import { IconButton, Stack } from "@mui/material"
+import { X } from "lucide-react"
 import { useAppStore } from "../stores"
-import { Stack } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
 
 export default function EpisodePlayer() {
   const episode = useAppStore(state => state.playingEpisode)
-  if (!episode) return null
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playerVisible, setPlayerVisible] = useState(false)
+
+  useEffect(() => {
+    if (!episode) {
+      audioRef.current?.pause()
+    }
+  }, [episode])
 
   return (
     <Stack
       direction="row"
+      onTransitionEnd={() => setPlayerVisible(episode ? true : false)}
       sx={{
         width: "100%",
         position: "fixed",
-        bottom: 0,
+        bottom: episode ? "0" : "-100px",
         left: 0,
+        alignItems: "center",
         justifyContent: "center",
         py: 2,
+        pl: "40px",
+        transition: "all 0.3s ease-in-out",
       }}
     >
-      <audio controls autoPlay src={`/episodes/${episode.audio_file}`}>
-        Your browser does not support the audio element.
-      </audio>
+      {(episode || playerVisible) && (
+        <audio
+          controls
+          autoPlay
+          src={episode ? `/episodes/${episode.audio_file}` : undefined}
+          ref={audioRef}
+        >
+          Your browser does not support the audio element.
+        </audio>
+      )}
+      <IconButton
+        onClick={() => {
+          useAppStore.setState({ playingEpisode: undefined })
+        }}
+      >
+        <X />
+      </IconButton>
     </Stack>
   )
 }

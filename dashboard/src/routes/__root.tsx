@@ -47,7 +47,7 @@ function App() {
             <Rss color="orange" />
           </a>
         </h1>
-        <Stack spacing={5}>
+        <Stack spacing={5} marginBottom={20}>
           <CastInput />
           <Tabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Episodes" value="/" />

@@ -18,7 +18,8 @@ import axios from "axios"
 import { useState } from "react"
 import type { Episode, EpisodesResponse } from "../types"
 import { createFileRoute } from "@tanstack/react-router"
-import { Play, PlayCircle } from "lucide-react"
+import { AudioLines, PlayCircle } from "lucide-react"
+import { useAppStore } from "../stores"
 
 export const Route = createFileRoute("/")({
   component: EpisodesList,
@@ -59,9 +60,25 @@ function EpisodesList() {
 }
 
 const EpisodeItem = ({ episode }: { episode: Episode }) => {
+  const appStore = useAppStore()
+
   const headContent = (
     <Stack direction="row" alignItems="center" gap={0.5}>
-      <PlayCircle size={15} color={colors.grey[500]} />
+      {appStore.playingEpisode?.id === episode.id ? (
+        <AudioLines
+          size={15}
+          color={colors.orange[500]}
+          cursor="pointer"
+          onClick={() => appStore.setPlayingEpisode(undefined)}
+        />
+      ) : (
+        <PlayCircle
+          size={15}
+          color={colors.grey[500]}
+          cursor="pointer"
+          onClick={() => appStore.setPlayingEpisode(episode)}
+        />
+      )}
       <Typography sx={{ fontSize: "1.2rem" }}>{episode.title}</Typography>
     </Stack>
   )

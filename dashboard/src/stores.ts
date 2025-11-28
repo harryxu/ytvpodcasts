@@ -1,5 +1,15 @@
 import { create } from "zustand"
-import type { DownloadTask, DownloadTaskResponse } from "./types"
+import type { DownloadTask, DownloadTaskResponse, Episode } from "./types"
+
+export interface AppStoreInterface {
+  playingEpisode?: Episode
+  setPlayingEpisode: (episode?: Episode) => void
+}
+
+export const useAppStore = create<AppStoreInterface>(set => ({
+  playingEpisode: undefined,
+  setPlayingEpisode: (episode?: Episode) => set({ playingEpisode: episode }),
+}))
 
 export interface TaskStoreInterface {
   notifyCount: number
@@ -10,14 +20,14 @@ export interface TaskStoreInterface {
   setAllowAutoUpdate: (allow: boolean) => void
 }
 
-const initialState = {
+const taskInitialState = {
   notifyCount: 0,
   tasks: [],
   allowAutoUpdate: true,
 }
 
 export const useTaskStore = create<TaskStoreInterface>(set => ({
-  ...initialState,
+  ...taskInitialState,
 
   setTasks: (tasks: DownloadTaskResponse) =>
     set({ tasks: tasks.data, notifyCount: tasks.notify_count }),

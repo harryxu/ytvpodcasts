@@ -2,7 +2,8 @@ import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import useAxios from "axios-hooks"
 import { useState } from "react"
 import { toast } from "react-toastify"
-import { isYouTubeWatchUrl } from "./utils"
+import { isYouTubeWatchUrl } from "../utils"
+import { useDownloadTasksQuery } from "../api"
 
 export default function CastInput() {
   const [videoUrl, setVideoUrl] = useState("")
@@ -13,6 +14,8 @@ export default function CastInput() {
     },
     { manual: true }
   )
+
+  const taskQuery = useDownloadTasksQuery(false)
 
   const handleAdd = async () => {
     if (!isYouTubeWatchUrl(videoUrl)) {
@@ -27,6 +30,7 @@ export default function CastInput() {
     if (resp.status === 200) {
       setVideoUrl("")
       toast.success("Video download task added.")
+      taskQuery.refetch()
     }
   }
 

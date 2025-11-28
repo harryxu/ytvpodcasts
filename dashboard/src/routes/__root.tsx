@@ -8,11 +8,12 @@ import {
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useState } from "react"
-import CastInput from "../CastInput"
+import CastInput from "../components/CastInput"
 import ToastContainer from "../components/toastify"
 import "../App.css"
-import TaskUpdater from "../components/taskUpdater"
+import TaskUpdater from "../components/TaskUpdater"
 import { Rss } from "lucide-react"
+import EpisodePlayer from "../components/EpisodePlayer"
 
 export const Route = createRootRoute({
   component: App,
@@ -55,9 +56,10 @@ function App() {
           <Outlet />
         </Stack>
       </Container>
+      <EpisodePlayer />
       <TaskUpdater />
       <ToastContainer />
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
     </>
   )
 }

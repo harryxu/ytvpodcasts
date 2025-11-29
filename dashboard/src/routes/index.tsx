@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   colors,
@@ -63,22 +64,24 @@ const EpisodeItem = ({ episode }: { episode: Episode }) => {
   const appStore = useAppStore()
 
   const headContent = (
-    <Stack direction="row" alignItems="center" gap={0.5}>
-      {appStore.playingEpisode?.id === episode.id ? (
-        <AudioLines
-          size={15}
-          color={colors.orange[500]}
-          cursor="pointer"
-          onClick={() => appStore.setPlayingEpisode(undefined)}
-        />
-      ) : (
-        <PlayCircle
-          size={15}
-          color={colors.grey[500]}
-          cursor="pointer"
-          onClick={() => appStore.setPlayingEpisode(episode)}
-        />
-      )}
+    <Stack direction="row" alignItems="start" gap={0.5}>
+      <Box pt="5px">
+        {appStore.playingEpisode?.id === episode.id ? (
+          <AudioLines
+            size={15}
+            color={colors.orange[500]}
+            cursor="pointer"
+            onClick={() => appStore.setPlayingEpisode(undefined)}
+          />
+        ) : (
+          <PlayCircle
+            size={15}
+            color={colors.grey[500]}
+            cursor="pointer"
+            onClick={() => appStore.setPlayingEpisode(episode)}
+          />
+        )}
+      </Box>
       <Typography sx={{ fontSize: "1.2rem" }}>{episode.title}</Typography>
     </Stack>
   )

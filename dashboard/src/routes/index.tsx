@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   colors,
-  IconButton,
   List,
   ListItem,
   ListItemAvatar,
@@ -15,12 +14,12 @@ import {
   Typography,
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
-import { useState } from "react"
-import type { Episode, EpisodesResponse } from "../types"
 import { createFileRoute } from "@tanstack/react-router"
+import axios from "axios"
 import { AudioLines, PlayCircle } from "lucide-react"
+import { useState } from "react"
 import { useAppStore } from "../stores"
+import type { Episode, EpisodesResponse } from "../types"
 
 export const Route = createFileRoute("/")({
   component: EpisodesList,

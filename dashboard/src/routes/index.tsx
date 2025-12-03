@@ -1,9 +1,9 @@
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   colors,
-  IconButton,
   List,
   ListItem,
   ListItemAvatar,
@@ -14,11 +14,12 @@ import {
   Typography,
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
-import { useState } from "react"
-import type { Episode, EpisodesResponse } from "../types"
 import { createFileRoute } from "@tanstack/react-router"
-import { Play, PlayCircle } from "lucide-react"
+import axios from "axios"
+import { AudioLines, PlayCircle } from "lucide-react"
+import { useState } from "react"
+import { useAppStore } from "../stores"
+import type { Episode, EpisodesResponse } from "../types"
 
 export const Route = createFileRoute("/")({
   component: EpisodesList,
@@ -59,9 +60,27 @@ function EpisodesList() {
 }
 
 const EpisodeItem = ({ episode }: { episode: Episode }) => {
+  const appStore = useAppStore()
+
   const headContent = (
-    <Stack direction="row" alignItems="center" gap={0.5}>
-      <PlayCircle size={15} color={colors.grey[500]} />
+    <Stack direction="row" alignItems="start" gap={0.5}>
+      <Box pt="5px">
+        {appStore.playingEpisode?.id === episode.id ? (
+          <AudioLines
+            size={15}
+            color={colors.orange[500]}
+            cursor="pointer"
+            onClick={() => appStore.setPlayingEpisode(undefined)}
+          />
+        ) : (
+          <PlayCircle
+            size={15}
+            color={colors.grey[500]}
+            cursor="pointer"
+            onClick={() => appStore.setPlayingEpisode(episode)}
+          />
+        )}
+      </Box>
       <Typography sx={{ fontSize: "1.2rem" }}>{episode.title}</Typography>
     </Stack>
   )

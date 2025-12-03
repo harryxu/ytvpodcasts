@@ -1,18 +1,21 @@
 import { Box, Button, CircularProgress, TextField } from "@mui/material"
-import useAxios from "axios-hooks"
+import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
 import { useState } from "react"
 import { toast } from "react-toastify"
-import { isYouTubeWatchUrl } from "./utils"
+import { useDownloadTasksQuery } from "../api"
+import { isYouTubeWatchUrl } from "../utils"
 
 export default function CastInput() {
   const [videoUrl, setVideoUrl] = useState("")
-  const [castAddApi, executeAddCast] = useAxios(
-    {
-      url: "/api/add",
-      method: "POST",
+
+  const createCastMutation = useMutation({
+    mutationFn: async (url: string) => {
+      return axios.post("/api/add", { url })
     },
-    { manual: true }
-  )
+  })
+
+  const taskQuery = useDownloadTasksQuery(false)
 
   const handleAdd = async () => {
     if (!isYouTubeWatchUrl(videoUrl)) {
@@ -23,17 +26,18 @@ export default function CastInput() {
       return
     }
 
-    const resp = await executeAddCast({ data: { url: videoUrl } })
+    const resp = await createCastMutation.mutateAsync(videoUrl)
     if (resp.status === 200) {
       setVideoUrl("")
       toast.success("Video download task added.")
+      taskQuery.refetch()
     }
   }
 
   return (
     <Box sx={{ position: "relative" }}>
       <TextField
-        disabled={castAddApi.loading}
+        disabled={createCastMutation.isPending}
         label="YouTube URL"
         variant="outlined"
         fullWidth
@@ -49,7 +53,7 @@ export default function CastInput() {
           display: "flex",
         }}
       >
-        {!castAddApi.loading ? (
+        {!createCastMutation.isPending ? (
           <Button
             variant="contained"
             onClick={handleAdd}

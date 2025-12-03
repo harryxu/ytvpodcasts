@@ -75,8 +75,11 @@ def add_episode(youtube_url: str):
     info = get_video_info(youtube_url)
 
     if db.episode_exists(info["id"]):
-        click.echo(f"Video '{info['title']}' already exists in the podcast. Skipping.")
-        return
+        error_message = (
+            f"Video '{info['title']}' already exists in the podcast. Skipping."
+        )
+        click.echo(error_message)
+        raise Exception(error_message)
 
     audio_path = download_audio(youtube_url, info["id"])
 

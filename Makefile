@@ -21,6 +21,7 @@ startdev: migratedb
 	uv run honcho start
 
 .PHONY: migratedb
+migratedb:
 	@echo "Starting database migration..."
 	uv run alembic upgrade head
 

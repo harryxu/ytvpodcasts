@@ -1,5 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
+from sqlalchemy.sql._elements_constructors import false
 from typing import Any
 from sqlmodel import create_engine, SQLModel, Session, select, func
 from vpodcasts.models import DownloadTask, Episode
@@ -19,23 +20,30 @@ def add_episode(episode_data: dict[str, Any]):
         session.commit()
 
 
-def get_all_episodes():
+def get_all_episodes(is_archived: bool = False):
     with Session(engine) as session:
         episodes = session.exec(
-            select(Episode).order_by(Episode.create_date.desc())
+            select(Episode)
+            .where(Episode.is_archived == is_archived)
+            .order_by(Episode.create_date.desc())
         ).all()
         return episodes
 
 
-def get_episodes(page: int = 1, per_page: int = 10):
+def get_episodes(page: int = 1, per_page: int = 10, is_archived: bool = False):
     with Session(engine) as session:
         offset = (page - 1) * per_page
 
-        count_statement = select(func.count()).select_from(Episode)
+        count_statement = (
+            select(func.count())
+            .select_from(Episode)
+            .where(Episode.is_archived == is_archived)
+        )
         total_count = session.exec(count_statement).one()
 
         episodes = session.exec(
             select(Episode)
+            .where(Episode.is_archived == is_archived)
             .order_by(Episode.create_date.desc())
             .offset(offset)
             .limit(per_page)

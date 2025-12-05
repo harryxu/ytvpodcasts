@@ -18,6 +18,7 @@ class Episode(SQLModel, table=True):
     create_date: datetime | None = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+    is_archived: bool = Field(default=False)
 
 
 class DownloadTask(SQLModel, table=True):

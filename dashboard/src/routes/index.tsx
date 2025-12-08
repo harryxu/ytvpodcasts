@@ -20,6 +20,7 @@ import { AudioLines, Play } from "lucide-react"
 import { useState } from "react"
 import { useAppStore } from "../stores"
 import type { Episode, EpisodesResponse } from "../types"
+import EpisodeMeta from "../components/EpisodeMeta"
 
 export const Route = createFileRoute("/")({
   component: EpisodesList,
@@ -139,6 +140,7 @@ const EpisodeItem = ({ episode }: { episode: Episode }) => {
               WebkitBoxOrient: "vertical",
             }}
           >
+            <EpisodeMeta episode={episode} />
             {episode.description}
           </Typography>
         }

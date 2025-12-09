@@ -1,13 +1,17 @@
 import math
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import Response, FileResponse
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
-from feedgen.feed import FeedGenerator
 
-from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, Response
+from fastapi.templating import Jinja2Templates
+from feedgen.feed import FeedGenerator
+from pydantic import BaseModel
+from sqlmodel import Session, select
+
 import vpodcasts.database as db
+from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
+from vpodcasts.database import engine
 from vpodcasts.huey_tasks import create_video_download_task
+from vpodcasts.models import Episode
 
 app = FastAPI()
 templates = Jinja2Templates(directory="vpodcasts/templates")
@@ -56,6 +60,31 @@ def get_episodes(page: int = 1, per_page: int = 10):
             "total_items": total_items,
         },
     }
+
+
+@app.post("/api/episode/{id}/archive")
+def archive_episode(id):
+    with Session(engine) as session:
+        episode = session.exec(select(Episode).where(Episode.id == id)).first()
+        if episode:
+            episode.is_archived = True
+            session.commit()
+            return {"data": episode.model_dump_json()}
+        else:
+            raise HTTPException(status_code=404, detail="Episode not found")
+
+
+@app.delete("/api/episode/{id}")
+def delete_episode(id):
+    with Session(engine) as session:
+        episode = session.exec(select(Episode).where(Episode.id == id)).first()
+        if episode:
+            file = f"{EPISODES_DIR}/{episode.audio_file}"
+            if os.path.exists(file):
+                os.remove(file)
+            session.delete(episode)
+            session.commit()
+            return {"data": True}
 
 
 @app.get("/api/tasks")

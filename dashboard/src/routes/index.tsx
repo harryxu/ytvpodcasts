@@ -67,7 +67,7 @@ function EpisodesList() {
     queryKey: ["episodes", currentPage],
     queryFn: async (): Promise<EpisodesResponse> => {
       const res = await axios.get("/api/episodes", {
-        params: { page: currentPage, per_page: 5 },
+        params: { page: currentPage, per_page: 10 },
       })
       return res.data
     },
@@ -84,11 +84,13 @@ function EpisodesList() {
             ))}
           </List>
         )}
-        <Pagination
-          count={episodesQuery.data?.pagination?.total_pages ?? 0}
-          page={currentPage}
-          onChange={(_, page) => setCurrentPage(page)}
-        />
+        {(episodesQuery.data?.pagination?.total_pages ?? 0) > 1 && (
+          <Pagination
+            count={episodesQuery.data?.pagination?.total_pages ?? 0}
+            page={currentPage}
+            onChange={(_, page) => setCurrentPage(page)}
+          />
+        )}
       </CardContent>
     </Card>
   )

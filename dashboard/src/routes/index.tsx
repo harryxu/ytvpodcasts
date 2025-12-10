@@ -100,8 +100,14 @@ const EpisodeItem = ({ episode }: { episode: Episode }) => {
   const appStore = useAppStore()
 
   const headContent = (
-    <Stack direction="row" alignItems="start" gap={0.5}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      gap={0.5}
+    >
       <Typography sx={{ fontSize: "1.2rem" }}>{episode.title}</Typography>
+      <EpisodeMeta episode={episode} />
     </Stack>
   )
 
@@ -142,7 +148,6 @@ const EpisodeItem = ({ episode }: { episode: Episode }) => {
               WebkitBoxOrient: "vertical",
             }}
           >
-            <EpisodeMeta episode={episode} />
             {episode.description}
           </Typography>
         }

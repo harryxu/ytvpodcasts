@@ -139,12 +139,5 @@ def add(url: str):
     add_episode(url)
 
 
-@cli.command()
-def serve():
-    """Instructions to run the web server."""
-    click.echo("To run the web server, please use the following command:")
-    click.echo("\n    python3 webapp.py\n")
-
-
 if __name__ == "__main__":
     cli()

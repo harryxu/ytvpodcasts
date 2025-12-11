@@ -62,7 +62,7 @@ def get_episodes(page: int = 1, per_page: int = 10):
     }
 
 
-@app.post("/api/episode/{id}/archive")
+@app.post("/api/episodes/{id}/archive")
 def archive_episode(id):
     with Session(engine) as session:
         episode = session.exec(select(Episode).where(Episode.id == id)).first()

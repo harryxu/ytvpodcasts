@@ -64,10 +64,10 @@ function EpisodesList() {
   const [currentPage, setCurrentPage] = useState(1)
 
   const episodesQuery = useQuery({
-    queryKey: ["episodes", currentPage],
+    queryKey: ["episodesList", currentPage],
     queryFn: async (): Promise<EpisodesResponse> => {
       const res = await axios.get("/api/episodes", {
-        params: { page: currentPage, per_page: 10 },
+        params: { page: currentPage, per_page: 8 },
       })
       return res.data
     },
@@ -102,7 +102,7 @@ const EpisodeItem = ({ episode }: { episode: Episode }) => {
   const headContent = (
     <Stack
       direction="row"
-      alignItems="center"
+      alignItems="start"
       justifyContent="space-between"
       gap={0.5}
     >

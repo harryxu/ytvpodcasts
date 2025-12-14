@@ -1,5 +1,4 @@
 import {
-  Box,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -9,12 +8,12 @@ import {
   Typography,
   useTheme,
 } from "@mui/material"
-import type { Episode } from "../types"
-import { Archive, Clock, Ellipsis, Trash } from "lucide-react"
-import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
+import { Archive, Clock, Ellipsis, Trash } from "lucide-react"
+import { useState } from "react"
 import { toast } from "react-toastify"
+import type { Episode } from "../types"
 
 export default function EpisodeMeta({ episode }: { episode: Episode }) {
   const theme = useTheme()
@@ -54,6 +53,22 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
     setMenuAnchorEl(null)
   }
 
+  const deleteEpisode = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this episode? This action cannot be undone."
+      )
+    ) {
+      deleteMutation.mutate()
+    }
+    setMenuAnchorEl(null)
+  }
+
+  const isPending =
+    archiveMutation.isPending ||
+    deleteMutation.isPending ||
+    queryClient.isFetching({ queryKey: ["episodesList"] }) > 0
+
   return (
     <>
       <Stack
@@ -65,10 +80,7 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
         <EpisodeDuration duration={episode.duration} />
         <IconButton
           onClick={event => setMenuAnchorEl(event.currentTarget)}
-          loading={
-            archiveMutation.isPending ||
-            queryClient.isFetching({ queryKey: ["episodesList"] }) > 0
-          }
+          loading={isPending}
         >
           <Ellipsis size={15} color={theme.palette.grey[500]} />
         </IconButton>
@@ -84,7 +96,7 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
           </ListItemIcon>
           <ListItemText>Archive</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => deleteMutation.mutate()}>
+        <MenuItem onClick={deleteEpisode}>
           <ListItemIcon>
             <Trash size={16} color={theme.palette.error.main} />
           </ListItemIcon>

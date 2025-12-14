@@ -1,6 +1,6 @@
 # YTVPodcasts
 
-YTVPodcasts is a self-hosted tool currently under development that allows you to turn individual YouTube videos into a private podcast feed.
+YTVPodcasts is a work in progress self-hosted tool for turning individual YouTube videos into a private podcast feed.
 
 ## Overview
 

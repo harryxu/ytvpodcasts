@@ -32,3 +32,11 @@ docker:
 .PHONY: run-docker
 run-docker:
 	cd docker && docker-compose up
+
+.PHONY: devcontainer-up
+devcontainer-up:
+	devcontainer up --workspace-folder .
+	
+.PHONY: devcontainer-shell
+devcontainer-shell:
+	devcontainer exec --workspace-folder . bash

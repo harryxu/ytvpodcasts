@@ -1,0 +1,14 @@
+
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/python:3.13
+    container_name: vpodcasts-dev
+    volumes:
+      - ..:/workspaces/vpodcasts:cached
+    command: sleep infinity
+
+    ports:
+      - "5180:5180"
+      - "5080:5080"
+
+    user: vscode

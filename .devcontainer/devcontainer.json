@@ -1,6 +1,8 @@
 {
   "name": "vpodcasts-dev",
-  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/vpodcasts",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24",

@@ -12,6 +12,8 @@ load_dotenv(str(PROJECT_ROOT / ".env"))
 # --- Database Configuration ---
 DB_FILE = os.getenv("DB_FILE", str(PROJECT_ROOT / "data" / "vpodcasts.db"))
 
+NATS_URL = os.getenv("NATS_URL", "nats://nats:4222")
+
 # --- File and Directory Paths ---
 EPISODES_DIR = os.getenv("EPISODES_DIR", str(PROJECT_ROOT / "data" / "episodes"))
 

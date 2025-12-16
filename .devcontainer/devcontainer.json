@@ -8,9 +8,9 @@
       "version": "24",
       "pnpm": "latest"
     },
-	  "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {}
+    "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {}
   },
-  "forwardPorts": [5180],
+  "forwardPorts": [5180, 5080],
   "remoteEnv": {
     "UV_PROJECT_ENVIRONMENT": ".venv-devcontainer"
   },

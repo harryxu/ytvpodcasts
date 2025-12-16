@@ -13,25 +13,27 @@ The system provides a web-based dashboard where users can submit YouTube video U
 - **RSS Feed Generation**: Instantly creates a podcast-compatible RSS feed for your downloaded content.
 - **Self-Hosted**: Run it on your own server for privacy and control.
 
-## Getting Started
 
-### Development
+## Development
 
-To start the development environment, ensure you have `uv` installed, then run:
 
-```bash
+To start the development environment, the simplest way is to use [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers).
+
+
+```shell
+# Install Dev Container CLI if you haven't already.
+npm install -g @devcontainers/cli
+
+# Starting the dev container will install all Python and Node dependencies on its initial run.
+# If the setup is successful, will automatically enter the dev container shell.
+make devcontainer-shell
+
+# Run the development server in dev container shell.
 make startdev
 ```
 
-This command will run database migrations and start all necessary services.
+Access http://localhost:5180/ to view the dashboard.
 
-### Docker
-
-You can also run the application using Docker:
-
-```bash
-make run-docker
-```
 
 ## Comparisons
 

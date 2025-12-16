@@ -4,22 +4,23 @@ version = "0.1.0"
 description = "YouTube as Podcast"
 requires-python = "==3.13.*"
 dependencies = [
-    "feedgen>=1.0.0",
-    "lxml==5.4.0",
-    "python-dateutil==2.9.0.post0",
-    "yt-dlp>=2025.11.12",
-    "six>=1.17.0",
-    "python-dotenv==0.21.0",
-    "click>=8.0.0",
-    "supervisor>=4.2.5",
-    "honcho>=2.0.0",
-    "sqlmodel>=0.0.25",
-    "alembic>=1.16.5",
-    "huey>=2.5.3",
-    "fastapi[standard]>=0.121.0",
-    "uvicorn[standard]>=0.38.0",
-    "uvloop>=0.22.1",
-    "httptools>=0.7.1",
+  "feedgen>=1.0.0",
+  "lxml==5.4.0",
+  "python-dateutil==2.9.0.post0",
+  "yt-dlp>=2025.11.12",
+  "six>=1.17.0",
+  "python-dotenv==0.21.0",
+  "click>=8.0.0",
+  "supervisor>=4.2.5",
+  "honcho>=2.0.0",
+  "sqlmodel>=0.0.25",
+  "alembic>=1.16.5",
+  "huey>=2.5.3",
+  "fastapi[standard]>=0.121.0",
+  "uvicorn[standard]>=0.38.0",
+  "uvloop>=0.22.1",
+  "httptools>=0.7.1",
+  "nats-py>=2.12.0",
 ]
 
 [tool.uv]
@@ -34,10 +35,11 @@ packages = ["."]
 
 [tool.basedpyright]
 ignore = [
-    ".venv",
-    "alembic",
-    "**/node_modules",
-    "**/__pycache__"
+  ".venv",
+  ".venv-devcontainer",
+  "alembic",
+  "**/node_modules",
+  "**/__pycache__",
 ]
 reportExplicitAny = false
 reportAny = false

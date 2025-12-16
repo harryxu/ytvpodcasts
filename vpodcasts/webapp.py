@@ -1,4 +1,5 @@
 import math
+import os
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
@@ -74,7 +75,7 @@ def archive_episode(id):
             raise HTTPException(status_code=404, detail="Episode not found")
 
 
-@app.delete("/api/episode/{id}")
+@app.delete("/api/episodes/{id}")
 def delete_episode(id):
     with Session(engine) as session:
         episode = session.exec(select(Episode).where(Episode.id == id)).first()
@@ -85,6 +86,8 @@ def delete_episode(id):
             session.delete(episode)
             session.commit()
             return {"data": True}
+        else:
+            raise HTTPException(status_code=404, detail="Episode not found")
 
 
 @app.get("/api/tasks")

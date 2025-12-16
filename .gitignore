@@ -4,6 +4,7 @@ docker-compose.prod.yml
 
 # Python virtual environment
 .venv/
+.venv*
 
 # Python cache
 __pycache__/
@@ -20,3 +21,5 @@ podcast.json
 # macOS
 .DS_Store
 
+# Node
+.pnpm-store

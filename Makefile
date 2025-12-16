@@ -32,3 +32,23 @@ docker:
 .PHONY: run-docker
 run-docker:
 	cd docker && docker-compose up
+
+# dev container commands
+.PHONY: devcontainer-up
+devcontainer-up:
+	devcontainer up --workspace-folder .
+
+.PHONY: devcontainer-shell
+devcontainer-shell: devcontainer-up
+	devcontainer exec --workspace-folder . bash
+
+.PHONY: devcontainer-stop
+devcontainer-stop:
+	docker compose -p vpodcasts_devcontainer stop
+
+.PHONY: devcontainer-restart
+devcontainer-restart: devcontainer-stop devcontainer-shell
+
+.PHONY: devcontainer-build
+devcontainer-build:
+	devcontainer build --workspace-folder .

@@ -1,0 +1,31 @@
+{
+  "name": "vpodcasts-dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/vpodcasts",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24",
+      "pnpm": "latest"
+    },
+	  "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {}
+  },
+  "forwardPorts": [5180],
+  "remoteEnv": {
+    "UV_PROJECT_ENVIRONMENT": ".venv-devcontainer"
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "uv sync && cd dashboard && pnpm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

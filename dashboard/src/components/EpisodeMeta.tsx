@@ -1,17 +1,19 @@
 import {
-  Box,
   IconButton,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
   Stack,
   Typography,
   useTheme,
 } from "@mui/material"
-import type { Episode } from "../types"
-import { Clock, Ellipsis } from "lucide-react"
-import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
+import { Archive, Clock, Ellipsis, Trash } from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-toastify"
+import type { Episode } from "../types"
 
 export default function EpisodeMeta({ episode }: { episode: Episode }) {
   const theme = useTheme()
@@ -28,6 +30,21 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
       queryClient.invalidateQueries({
         queryKey: ["episodesList"],
       })
+
+      toast.success("Episode has been archived.")
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await axios.delete(`/api/episodes/${episode.id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["episodesList"],
+      })
+
+      toast.success("Episode has been deleted.")
     },
   })
 
@@ -35,6 +52,22 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
     archiveMutation.mutate()
     setMenuAnchorEl(null)
   }
+
+  const deleteEpisode = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this episode? This action cannot be undone."
+      )
+    ) {
+      deleteMutation.mutate()
+    }
+    setMenuAnchorEl(null)
+  }
+
+  const isPending =
+    archiveMutation.isPending ||
+    deleteMutation.isPending ||
+    queryClient.isFetching({ queryKey: ["episodesList"] }) > 0
 
   return (
     <>
@@ -47,10 +80,7 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
         <EpisodeDuration duration={episode.duration} />
         <IconButton
           onClick={event => setMenuAnchorEl(event.currentTarget)}
-          loading={
-            archiveMutation.isPending ||
-            queryClient.isFetching({ queryKey: ["episodesList"] }) > 0
-          }
+          loading={isPending}
         >
           <Ellipsis size={15} color={theme.palette.grey[500]} />
         </IconButton>
@@ -60,8 +90,18 @@ export default function EpisodeMeta({ episode }: { episode: Episode }) {
         open={menuOpen}
         onClose={() => setMenuAnchorEl(null)}
       >
-        <MenuItem onClick={archiveEpisode}>Archive</MenuItem>
-        <MenuItem>Delete</MenuItem>
+        <MenuItem onClick={archiveEpisode}>
+          <ListItemIcon>
+            <Archive size={16} />
+          </ListItemIcon>
+          <ListItemText>Archive</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={deleteEpisode}>
+          <ListItemIcon>
+            <Trash size={16} color={theme.palette.error.main} />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
       </Menu>
     </>
   )

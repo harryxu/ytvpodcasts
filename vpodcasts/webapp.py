@@ -163,7 +163,7 @@ def generate_rss_feed():
     return fg.rss_str(pretty=True)
 
 
-@app.get("/api/subscribe")
+@app.get("/api/eventstream")
 async def subscribe():
     queue: asyncio.Queue = asyncio.Queue()
 

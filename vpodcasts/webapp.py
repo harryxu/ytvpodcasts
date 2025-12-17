@@ -1,21 +1,44 @@
+import json
+import asyncio
 import math
 import os
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
 import vpodcasts.database as db
-from vpodcasts.config import BASE_URL, EPISODES_DIR, PODCAST_DESCRIPTION, PODCAST_TITLE
+from vpodcasts.config import (
+    BASE_URL,
+    EPISODES_DIR,
+    PODCAST_DESCRIPTION,
+    PODCAST_TITLE,
+    NATS_URL,
+)
 from vpodcasts.database import engine
 from vpodcasts.huey_tasks import create_video_download_task
 from vpodcasts.models import Episode
 
+from nats.aio.client import Client as NATS
+
+nc = NATS()
+
+
 app = FastAPI()
 templates = Jinja2Templates(directory="vpodcasts/templates")
+
+
+@app.on_event("startup")
+async def startup():
+    await nc.connect(NATS_URL)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await nc.close()
 
 
 @app.get("/")
@@ -138,3 +161,31 @@ def generate_rss_feed():
             fe.podcast.itunes_duration(episode_info.duration)
 
     return fg.rss_str(pretty=True)
+
+
+@app.get("/api/eventstream")
+async def subscribe():
+    queue: asyncio.Queue = asyncio.Queue()
+
+    subject = "notification"
+
+    async def handler(msg):
+        data = msg.data.decode()
+        await queue.put(json.loads(data))
+
+    sub = await nc.subscribe(subject, cb=handler)
+
+    async def event_stream():
+        try:
+            while True:
+                message = await queue.get()
+                yield json.dumps(message) + "\n"
+        except asyncio.CancelledError:
+            pass
+        finally:
+            await sub.unsubscribe()
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="application/json",
+    )

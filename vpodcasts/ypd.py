@@ -5,6 +5,8 @@ import sys
 
 import click
 
+from yt_dlp import YoutubeDL
+
 import vpodcasts.database as db
 from vpodcasts.config import EPISODES_DIR, YOUTUBE_COOKIES_FILE
 
@@ -40,33 +42,30 @@ def download_audio(youtube_url: str, video_id: str):
     """Download the best quality audio and save it to the episodes directory"""
     audio_format = "mp3"
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
-    command = create_ytdlp_command(
-        [
-            "yt-dlp",
-            "-x",
-            "--audio-format",
-            audio_format,
-            "--audio-quality",
-            "5",
-            "-o",
-            output_template,
+
+    ydl_opts = {
+        "outtmpl": output_template,
+        "format": "bestaudio/best",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": audio_format,
+                "preferredquality": "5",
+            }
         ],
-        youtube_url,
-    )
+    }
+
     try:
-        click.echo(f"Starting audio download for {youtube_url} with command: {command}")
-        subprocess.run(command, check=True, capture_output=True, text=True)
+        click.echo(f"Starting audio download for {youtube_url}")
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([youtube_url])
         click.echo("Download completed successfully.")
         filename = f"{video_id}.{audio_format}"
         return filename
-    except subprocess.CalledProcessError as e:
-        error_message = f"Error downloading audio: {e.stderr}"
+    except Exception as e:
+        error_message = f"Error downloading audio: {e}"
         click.echo(error_message, err=True)
         raise Exception(error_message)
-    except FileNotFoundError:
-        click.echo("Error: 'yt-dlp' command not found.", err=True)
-        click.echo("Please install yt-dlp: pip install yt-dlp", err=True)
-        sys.exit(1)
 
 
 def add_episode(youtube_url: str):

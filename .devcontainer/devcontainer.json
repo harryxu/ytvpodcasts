@@ -4,11 +4,13 @@
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/vpodcasts",
   "features": {
+    "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24",
       "pnpm": "latest"
     },
-    "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {}
+    "ghcr.io/devcontainers-community/features/deno": {},
+    "ghcr.io/devcontainers-extra/features/ffmpeg-apt-get:1": {}
   },
   "forwardPorts": [5180, 5080],
   "remoteEnv": {

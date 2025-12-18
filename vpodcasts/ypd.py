@@ -1,4 +1,7 @@
+from typing import Callable
 import os
+
+from typing import Any
 
 import click
 from yt_dlp import YoutubeDL
@@ -20,7 +23,12 @@ def initialize_project():
 def get_video_info(youtube_url: str):
     """Get video metadata using yt-dlp"""
 
-    ydl_opts = {"forcejson": True, "noprogress": True, "quiet": True, "simulate": True}
+    ydl_opts: Any = {
+        "forcejson": True,
+        "noprogress": True,
+        "quiet": True,
+        "simulate": True,
+    }
 
     try:
         click.echo(
@@ -37,12 +45,14 @@ def get_video_info(youtube_url: str):
         raise Exception(error_message)
 
 
-def download_audio(youtube_url: str, video_id: str):
+def download_audio(
+    youtube_url: str, video_id: str, progress_cb: Callable[[dict], None] | None = None
+):
     """Download the best quality audio and save it to the episodes directory"""
     audio_format = "mp3"
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
 
-    ydl_opts = {
+    ydl_opts: Any = {
         "final_ext": "mp3",
         "format": "bestaudio/best",
         "outtmpl": {"default": output_template},
@@ -55,6 +65,9 @@ def download_audio(youtube_url: str, video_id: str):
             }
         ],
     }
+    if progress_cb:
+        ydl_opts["progress_hooks"] = [progress_cb]
+
     try:
         click.echo(f"Starting audio download for {youtube_url}")
         with YoutubeDL(ydl_opts) as ydl:
@@ -68,12 +81,12 @@ def download_audio(youtube_url: str, video_id: str):
         raise Exception(error_message)
 
 
-def add_episode(youtube_url: str):
+def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = None):
     """Handle the 'add' command: download, update database, regenerate RSS"""
     initialize_project()
     info = get_video_info(youtube_url)
     if not info:
-        return
+        raise Exception("Failed to fetch video info.")
 
     if db.episode_exists(info["id"]):
         error_message = (
@@ -82,7 +95,7 @@ def add_episode(youtube_url: str):
         click.echo(error_message)
         raise Exception(error_message)
 
-    audio_path = download_audio(youtube_url, info["id"])
+    audio_path = download_audio(youtube_url, info["id"], progress_cb)
 
     audio_file_path = os.path.join(EPISODES_DIR, audio_path)
     audio_file_size = os.path.getsize(audio_file_path)
@@ -98,10 +111,10 @@ def add_episode(youtube_url: str):
 
     episode_data = {
         "id": info["id"],
-        "title": info["title"],
+        "title": info.get("title"),
         "description": info.get("description", "No description available."),
-        "webpage_url": info["webpage_url"],
-        "upload_date": info["upload_date"],
+        "webpage_url": info.get("webpage_url"),
+        "upload_date": info.get("upload_date"),
         "duration": info.get("duration"),
         "thumbnail": info.get("thumbnail"),
         "audio_file": audio_path,

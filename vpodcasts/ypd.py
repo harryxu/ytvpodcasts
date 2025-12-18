@@ -115,7 +115,7 @@ def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = N
         "description": info.get("description", "No description available."),
         "webpage_url": info.get("webpage_url"),
         "upload_date": info.get("upload_date"),
-        "duration": info.get("duration"),
+        "duration": int(info.get("duration") or 0),
         "thumbnail": info.get("thumbnail"),
         "audio_file": audio_path,
         "audio_file_size": audio_file_size,

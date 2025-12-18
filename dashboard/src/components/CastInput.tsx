@@ -4,7 +4,7 @@ import axios from "axios"
 import { useState } from "react"
 import { toast } from "react-toastify"
 import { useDownloadTasksQuery } from "../api"
-import { isYouTubeWatchUrl } from "../utils"
+import { isValidUrl } from "../utils"
 
 export default function CastInput() {
   const [videoUrl, setVideoUrl] = useState("")
@@ -18,7 +18,7 @@ export default function CastInput() {
   const taskQuery = useDownloadTasksQuery(false)
 
   const handleAdd = async () => {
-    if (!isYouTubeWatchUrl(videoUrl)) {
+    if (!isValidUrl(videoUrl)) {
       toast.error("Video URL must be a youtube.com URL", {
         position: "top-center",
         toastId: "error",

@@ -1,10 +1,9 @@
-import json
+from typing import Callable
 import os
-import subprocess
-import sys
+
+from typing import Any
 
 import click
-
 from yt_dlp import YoutubeDL
 
 import vpodcasts.database as db
@@ -23,37 +22,51 @@ def initialize_project():
 
 def get_video_info(youtube_url: str):
     """Get video metadata using yt-dlp"""
-    command = create_ytdlp_command(["yt-dlp", "--dump-json"], youtube_url)
+
+    ydl_opts: Any = {
+        "forcejson": True,
+        "noprogress": True,
+        "quiet": True,
+        "simulate": True,
+    }
+
     try:
-        click.echo(f"Fetching metadata for {youtube_url} with command {command}")
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        return json.loads(result.stdout)
-    except subprocess.CalledProcessError as e:
-        error_message = f"Error fetching video info: {e.stderr}"
+        click.echo(
+            f"Fetching metadata for {youtube_url} using yt-dlp library with options {ydl_opts}"
+        )
+
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(youtube_url, download=False)
+            return ydl.sanitize_info(info_dict)
+
+    except Exception as e:
+        error_message = f"Error fetching video info: {e}"
         click.echo(error_message, err=True)
         raise Exception(error_message)
-    except FileNotFoundError:
-        click.echo("Error: 'yt-dlp' command not found.", err=True)
-        click.echo("Please install yt-dlp: pip install yt-dlp", err=True)
-        sys.exit(1)
 
 
-def download_audio(youtube_url: str, video_id: str):
+def download_audio(
+    youtube_url: str, video_id: str, progress_cb: Callable[[dict], None] | None = None
+):
     """Download the best quality audio and save it to the episodes directory"""
     audio_format = "mp3"
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
 
-    ydl_opts = {
-        "outtmpl": output_template,
+    ydl_opts: Any = {
+        "final_ext": "mp3",
         "format": "bestaudio/best",
+        "outtmpl": {"default": output_template},
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
-                "preferredcodec": audio_format,
+                "nopostoverwrites": False,
+                "preferredcodec": "mp3",
                 "preferredquality": "5",
             }
         ],
     }
+    if progress_cb:
+        ydl_opts["progress_hooks"] = [progress_cb]
 
     try:
         click.echo(f"Starting audio download for {youtube_url}")
@@ -68,10 +81,12 @@ def download_audio(youtube_url: str, video_id: str):
         raise Exception(error_message)
 
 
-def add_episode(youtube_url: str):
+def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = None):
     """Handle the 'add' command: download, update database, regenerate RSS"""
     initialize_project()
     info = get_video_info(youtube_url)
+    if not info:
+        raise Exception("Failed to fetch video info.")
 
     if db.episode_exists(info["id"]):
         error_message = (
@@ -80,7 +95,7 @@ def add_episode(youtube_url: str):
         click.echo(error_message)
         raise Exception(error_message)
 
-    audio_path = download_audio(youtube_url, info["id"])
+    audio_path = download_audio(youtube_url, info["id"], progress_cb)
 
     audio_file_path = os.path.join(EPISODES_DIR, audio_path)
     audio_file_size = os.path.getsize(audio_file_path)
@@ -96,10 +111,10 @@ def add_episode(youtube_url: str):
 
     episode_data = {
         "id": info["id"],
-        "title": info["title"],
+        "title": info.get("title"),
         "description": info.get("description", "No description available."),
-        "webpage_url": info["webpage_url"],
-        "upload_date": info["upload_date"],
+        "webpage_url": info.get("webpage_url"),
+        "upload_date": info.get("upload_date"),
         "duration": info.get("duration"),
         "thumbnail": info.get("thumbnail"),
         "audio_file": audio_path,

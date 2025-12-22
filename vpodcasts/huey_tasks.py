@@ -1,15 +1,17 @@
+import asyncio
 import json
-from vpodcasts.config import NATS_URL
 from datetime import datetime, timezone
+from typing import Any
 
 from huey import SqliteHuey
 from huey.api import Task
 from huey.signals import SIGNAL_COMPLETE, SIGNAL_ERROR, SIGNAL_EXECUTING
+from loguru import logger
 from nats.aio.client import Client as NATS
 from sqlmodel import Session, select
 
 import vpodcasts.database as db
-from vpodcasts.config import DB_FILE
+from vpodcasts.config import DB_FILE, NATS_URL
 from vpodcasts.models import DownloadTask
 from vpodcasts.ypd import add_episode
 
@@ -45,7 +47,7 @@ def create_video_download_task(url: str):
 
 
 @huey.signal(SIGNAL_EXECUTING)
-async def _handle_download_executing(signal, task: Task):
+def _handle_download_executing(signal, task: Task):
     with Session(db.engine) as session:
         download_task = session.exec(
             select(DownloadTask).where(DownloadTask.queue_task_id == task.id)
@@ -54,13 +56,17 @@ async def _handle_download_executing(signal, task: Task):
             download_task.status = "processing"
             session.add(download_task)
             session.commit()
-            nc = await get_nats_connection()
-            await nc.publish(
-                "notification",
-                json.dumps(
-                    {"type": "task", "task": task, "status": "processing"}
-                ).encode(),
+            logger.info(f"Download task {task.id} started")
+            asyncio.run(
+                publish_notification(
+                    {
+                        "type": "task",
+                        "task": download_task.model_dump_json(),
+                        "status": "processing",
+                    }
+                )
             )
+            logger.info(f"Download task {task.id} started notification")
 
 
 @huey.signal(SIGNAL_COMPLETE)
@@ -80,7 +86,7 @@ def _handle_download_complete(signal, task: Task):
 
 
 @huey.signal(SIGNAL_ERROR)
-async def _handle_download_error(signal, task: Task, exc=None):
+def _handle_download_error(signal, task: Task, exc=None):
     with Session(db.engine) as session:
         download_task = session.exec(
             select(DownloadTask).where(DownloadTask.queue_task_id == task.id)
@@ -90,8 +96,23 @@ async def _handle_download_error(signal, task: Task, exc=None):
             download_task.description = str(exc)
             session.add(download_task)
             session.commit()
-            nc = await get_nats_connection()
-            await nc.publish(
-                "notification",
-                json.dumps({"type": "task", "task": task, "status": "failed"}).encode(),
+            logger.info(f"Download task {task.id} failed")
+            asyncio.run(
+                publish_notification(
+                    {
+                        "type": "task",
+                        "task": download_task.model_dump_json(),
+                        "status": "failed",
+                    }
+                )
             )
+            logger.info(f"Download task {task.id} failed notification")
+
+
+async def publish_notification(payload: Any, drain_after_publish: bool = False):
+    nc = await get_nats_connection()
+    await nc.publish("notification", json.dumps(payload).encode())
+    await nc.flush()
+    await nc.close()
+    if drain_after_publish:
+        await nc.drain()

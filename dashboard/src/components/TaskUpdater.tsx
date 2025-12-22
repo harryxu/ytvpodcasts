@@ -43,7 +43,6 @@ export default function TaskUpdater() {
 
   useEffect(() => {
     if (!responseRef.current) {
-      console.log("no streaming")
       startStream()
     }
 

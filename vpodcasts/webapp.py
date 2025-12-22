@@ -1,5 +1,5 @@
-import json
 import asyncio
+import json
 import math
 import os
 from contextlib import asynccontextmanager
@@ -8,6 +8,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
+from loguru import logger
+from nats.aio.client import Client as NATS
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -15,15 +17,13 @@ import vpodcasts.database as db
 from vpodcasts.config import (
     BASE_URL,
     EPISODES_DIR,
+    NATS_URL,
     PODCAST_DESCRIPTION,
     PODCAST_TITLE,
-    NATS_URL,
 )
 from vpodcasts.database import engine
 from vpodcasts.huey_tasks import create_video_download_task
 from vpodcasts.models import Episode
-
-from nats.aio.client import Client as NATS
 
 nc = NATS()
 
@@ -171,6 +171,7 @@ async def subscribe():
 
     async def handler(msg):
         data = msg.data.decode()
+        logger.info(f"nats Received message: {data}")
         await queue.put(json.loads(data))
 
     sub = await nc.subscribe(subject, cb=handler)

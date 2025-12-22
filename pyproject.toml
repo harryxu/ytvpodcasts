@@ -21,6 +21,7 @@ dependencies = [
   "httptools>=0.7.1",
   "nats-py>=2.12.0",
   "yt-dlp[default]>=2025.12.8",
+  "loguru>=0.7.3",
 ]
 
 [tool.uv]

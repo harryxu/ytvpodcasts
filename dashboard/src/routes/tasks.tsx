@@ -23,7 +23,7 @@ export const Route = createFileRoute("/tasks")({
 })
 
 function TaskList() {
-  const tasksQuery = useDownloadTasksQuery(false)
+  const tasksQuery = useDownloadTasksQuery()
   const taskStore = useTaskStore()
   const setAllowAutoUpdate = taskStore.setAllowAutoUpdate
 

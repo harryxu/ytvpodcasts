@@ -180,7 +180,7 @@ async def subscribe():
         try:
             while True:
                 message = await queue.get()
-                yield json.dumps(message) + "\n"
+                yield "data: " + json.dumps(message) + "\n\n"
         except asyncio.CancelledError:
             pass
         finally:
@@ -188,5 +188,6 @@ async def subscribe():
 
     return StreamingResponse(
         event_stream(),
-        media_type="application/json",
+        # media_type="application/json",
+        media_type="text/event-stream",
     )

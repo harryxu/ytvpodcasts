@@ -1,21 +1,36 @@
+import json
+from vpodcasts.config import NATS_URL
 from datetime import datetime, timezone
+
 from huey import SqliteHuey
 from huey.api import Task
 from huey.signals import SIGNAL_COMPLETE, SIGNAL_ERROR, SIGNAL_EXECUTING
+from nats.aio.client import Client as NATS
+from sqlmodel import Session, select
 
+import vpodcasts.database as db
 from vpodcasts.config import DB_FILE
 from vpodcasts.models import DownloadTask
 from vpodcasts.ypd import add_episode
-from sqlmodel import Session, select
-import vpodcasts.database as db
-
 
 huey = SqliteHuey(filename=DB_FILE)
+
+nc = NATS()
+
+
+async def get_nats_connection():
+    if nc.is_connected:
+        return nc
+    await nc.connect(NATS_URL)
+    return nc
 
 
 @huey.task()
 def add_video(youtube_url: str):
-    return add_episode(youtube_url)
+    def progress_cb(progress: dict):
+        print(progress)
+
+    return add_episode(youtube_url, progress_cb)
 
 
 def create_video_download_task(url: str):
@@ -30,7 +45,7 @@ def create_video_download_task(url: str):
 
 
 @huey.signal(SIGNAL_EXECUTING)
-def _handle_download_executing(signal, task: Task):
+async def _handle_download_executing(signal, task: Task):
     with Session(db.engine) as session:
         download_task = session.exec(
             select(DownloadTask).where(DownloadTask.queue_task_id == task.id)
@@ -39,6 +54,13 @@ def _handle_download_executing(signal, task: Task):
             download_task.status = "processing"
             session.add(download_task)
             session.commit()
+            nc = await get_nats_connection()
+            await nc.publish(
+                "notification",
+                json.dumps(
+                    {"type": "task", "task": task, "status": "processing"}
+                ).encode(),
+            )
 
 
 @huey.signal(SIGNAL_COMPLETE)
@@ -58,7 +80,7 @@ def _handle_download_complete(signal, task: Task):
 
 
 @huey.signal(SIGNAL_ERROR)
-def _handle_download_error(signal, task: Task, exc=None):
+async def _handle_download_error(signal, task: Task, exc=None):
     with Session(db.engine) as session:
         download_task = session.exec(
             select(DownloadTask).where(DownloadTask.queue_task_id == task.id)
@@ -68,3 +90,8 @@ def _handle_download_error(signal, task: Task, exc=None):
             download_task.description = str(exc)
             session.add(download_task)
             session.commit()
+            nc = await get_nats_connection()
+            await nc.publish(
+                "notification",
+                json.dumps({"type": "task", "task": task, "status": "failed"}).encode(),
+            )

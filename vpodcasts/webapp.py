@@ -2,6 +2,7 @@ import json
 import asyncio
 import math
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
@@ -27,18 +28,17 @@ from nats.aio.client import Client as NATS
 nc = NATS()
 
 
-app = FastAPI()
-templates = Jinja2Templates(directory="vpodcasts/templates")
-
-
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
     await nc.connect(NATS_URL)
-
-
-@app.on_event("shutdown")
-async def shutdown():
+    yield
+    # Shutdown
     await nc.close()
+
+
+app = FastAPI(lifespan=lifespan)
+templates = Jinja2Templates(directory="vpodcasts/templates")
 
 
 @app.get("/")

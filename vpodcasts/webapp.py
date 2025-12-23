@@ -1,3 +1,4 @@
+from vpodcasts.taskiq_broker import create_video_download_task, broker as taskiq_broker
 import asyncio
 import json
 import math
@@ -13,6 +14,7 @@ from nats.aio.client import Client as NATS
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
+
 import vpodcasts.database as db
 from vpodcasts.config import (
     BASE_URL,
@@ -22,7 +24,6 @@ from vpodcasts.config import (
     PODCAST_TITLE,
 )
 from vpodcasts.database import engine
-from vpodcasts.huey_tasks import create_video_download_task
 from vpodcasts.models import Episode
 
 nc = NATS()
@@ -34,7 +35,7 @@ async def lifespan(app: FastAPI):
     await nc.connect(NATS_URL)
     yield
     # Shutdown
-    await nc.close()
+    await nc.drain()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -64,10 +65,10 @@ class AddEpisodePayload(BaseModel):
 
 
 @app.post("/api/add")
-def add_episode(payload: AddEpisodePayload):
+async def add_episode(payload: AddEpisodePayload):
     if not payload.url:
         raise HTTPException(status_code=400, detail="Missing url")
-    create_video_download_task(payload.url)
+    await create_video_download_task(payload.url)
     return {"data": True}
 
 

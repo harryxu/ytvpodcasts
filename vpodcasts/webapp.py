@@ -1,4 +1,3 @@
-from vpodcasts.taskiq_broker import create_video_download_task, broker as taskiq_broker
 import asyncio
 import json
 import math
@@ -14,7 +13,6 @@ from nats.aio.client import Client as NATS
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-
 import vpodcasts.database as db
 from vpodcasts.config import (
     BASE_URL,
@@ -25,6 +23,8 @@ from vpodcasts.config import (
 )
 from vpodcasts.database import engine
 from vpodcasts.models import Episode
+from vpodcasts.taskiq_broker import broker as taskiq_broker
+from vpodcasts.taskiq_broker import create_video_download_task
 
 nc = NATS()
 
@@ -33,9 +33,11 @@ nc = NATS()
 async def lifespan(app: FastAPI):
     # Startup
     await nc.connect(NATS_URL)
+    await taskiq_broker.startup()
     yield
     # Shutdown
     await nc.drain()
+    await taskiq_broker.shutdown()
 
 
 app = FastAPI(lifespan=lifespan)

@@ -1,13 +1,13 @@
 from loguru import logger
-from sqlmodel import Session, select
-from taskiq_nats import PushBasedJetStreamBroker
+from sqlmodel import Session
+from taskiq_nats import PullBasedJetStreamBroker
 
 import vpodcasts.database as db
 from vpodcasts.config import NATS_URL
 from vpodcasts.models import DownloadTask
 from vpodcasts.ypd import add_episode
 
-broker = PushBasedJetStreamBroker(
+broker = PullBasedJetStreamBroker(
     servers=[NATS_URL],
     queue="vpodcasts_download_queue",
 )

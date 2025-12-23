@@ -56,12 +56,15 @@ def _handle_download_executing(signal, task: Task):
             download_task.status = "processing"
             session.add(download_task)
             session.commit()
+            session.refresh(download_task)
             logger.info(f"Download task {task.id} started")
             asyncio.run(
                 publish_notification(
                     {
                         "type": "task",
-                        "task": download_task.model_dump_json(),
+                        "task": download_task.model_dump(
+                            mode="json", exclude_unset=False
+                        ),
                         "status": "processing",
                     }
                 )
@@ -96,12 +99,15 @@ def _handle_download_error(signal, task: Task, exc=None):
             download_task.description = str(exc)
             session.add(download_task)
             session.commit()
+            session.refresh(download_task)
             logger.info(f"Download task {task.id} failed")
             asyncio.run(
                 publish_notification(
                     {
                         "type": "task",
-                        "task": download_task.model_dump_json(),
+                        "task": download_task.model_dump(
+                            mode="json", exclude_unset=False
+                        ),
                         "status": "failed",
                     }
                 )

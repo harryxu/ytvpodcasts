@@ -136,7 +136,7 @@ def create_ytdlp_command(command: list[str], youtube_url: str):
 
 @click.group()
 def cli():
-    """A command-line tool to generate a podcast RSS feed from YouTube videos."""
+    """A command-line tool to generate a podcast RSS feed from videos."""
     pass
 
 
@@ -149,7 +149,7 @@ def init():
 @cli.command()
 @click.argument("url")
 def add(url: str):
-    """Add a new YouTube video to the podcast."""
+    """Add a new video to the podcast."""
     add_episode(url)
 
 

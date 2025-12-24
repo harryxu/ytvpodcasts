@@ -1,7 +1,7 @@
 [project]
 name = "vpodcasts"
 version = "0.1.0"
-description = "YouTube as Podcast"
+description = "Private Podcast From Videos"
 requires-python = "==3.13.*"
 dependencies = [
   "feedgen>=1.0.0",

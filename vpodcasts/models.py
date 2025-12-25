@@ -1,7 +1,8 @@
-from typing import Literal
-from sqlmodel import Field, SQLModel, String
 from datetime import datetime, timezone
+from typing import Literal
+
 import sqlalchemy as sa
+from sqlmodel import Field, SQLModel, String
 
 
 class Episode(SQLModel, table=True):
@@ -25,7 +26,7 @@ class DownloadTask(SQLModel, table=True):
     __tablename__: str = "download_tasks"
 
     id: int = Field(default=None, primary_key=True)
-    queue_task_id: str = Field(max_length=100)
+    queue_task_id: str | None = None
     title: str = Field(max_length=100)
     description: str | None = None
     status: Literal["pending", "processing", "success", "failed"] = Field(

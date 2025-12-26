@@ -234,10 +234,7 @@ broker = PullBasedJetStreamBroker(
 ).with_middlewares(DownloadTaskMiddleware(nats_publisher, progress_publisher))
 
 
-@broker.task
-async def add_video_task(youtube_url: str, download_task: DownloadTask):
-    await progress_publisher.start()
-
+def download_video_handler(youtube_url: str, download_task: DownloadTask):
     def progress_cb(progress: dict):
         remove_keys = ["info_dict", "tmpfilename", "filename"]
         for k in remove_keys:
@@ -252,6 +249,13 @@ async def add_video_task(youtube_url: str, download_task: DownloadTask):
             )
 
     return add_episode(youtube_url, progress_cb)
+
+
+@broker.task
+async def add_video_task(youtube_url: str, download_task: DownloadTask):
+    await progress_publisher.start()
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, download_video_handler, youtube_url, download_task)
 
 
 async def create_video_download_task(url: str):

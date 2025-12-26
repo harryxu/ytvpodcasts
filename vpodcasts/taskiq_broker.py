@@ -1,9 +1,10 @@
 import asyncio
+import contextlib
 import json
 from collections.abc import Coroutine
 from datetime import datetime, timezone
 from types import CoroutineType
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from nats.aio.client import Client as NATS
 from sqlmodel import Session, select
@@ -16,18 +17,129 @@ from vpodcasts.config import NATS_URL
 from vpodcasts.models import DownloadTask
 from vpodcasts.ypd import add_episode
 
-nc = NATS()
+
+class NatsPublisher:
+    def __init__(self, servers: list[str]):
+        self.servers = servers
+        self.nc = NATS()
+        self._lock = asyncio.Lock()
+
+    async def _ensure_connected(self):
+        async with self._lock:
+            if self.nc.is_connected:
+                return
+            if self.nc.is_closed:
+                self.nc = NATS()
+
+        async def on_error(e):
+            logger.error("NATS error:", e)
+
+        async def on_disconnect():
+            logger.warning("NATS disconnected")
+
+        async def on_reconnect():
+            logger.info("NATS reconnected")
+
+        async def on_close():
+            logger.info("NATS closed")
+
+        await self.nc.connect(
+            servers=[NATS_URL],
+            max_reconnect_attempts=-1,
+            reconnect_time_wait=5,
+            error_cb=on_error,
+            disconnected_cb=on_disconnect,
+            reconnected_cb=on_reconnect,
+            closed_cb=on_close,
+        )
+
+    async def publish(self, payload: dict):
+        try:
+            await self._ensure_connected()
+            await self.nc.publish(
+                "notification",
+                json.dumps(payload).encode(),
+            )
+            await self.nc.flush(timeout=1)
+        except Exception as e:
+            logger.error("Failed to publish message to NATS:", e)
+
+    async def shutdown(self):
+        if self.nc.is_connected:
+            try:
+                await self.nc.drain()
+            finally:
+                await self.nc.close()
+
+
+class ProgressQueuePublisher:
+    def __init__(self, publisher: NatsPublisher):
+        self.publisher = publisher
+        self.queue: asyncio.Queue = asyncio.Queue()
+        self._task: Optional[asyncio.Task] = None
+        self._stopping = False
+
+    async def start(self):
+        if self._task is None:
+            self._task = asyncio.create_task(self._run())
+
+    async def _run(self):
+        while True:
+            payload = await self.queue.get()
+            try:
+                await self.publisher.publish(payload)
+            finally:
+                self.queue.task_done()
+
+    def enqueue(self, payload: dict):
+        if self._stopping:
+            return
+
+        if self._task is None:
+            raise RuntimeError("Publisher not started")
+
+        self.queue.put_nowait(payload)
+
+    async def shutdown(self, timeout: float = 5.0):
+        if self._task is None:
+            return
+
+        self._stopping = True
+
+        try:
+            await asyncio.wait_for(self.queue.join(), timeout)
+        except asyncio.TimeoutError:
+            pass
+
+        self._task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await self._task
+            self._stopping = False
+            self._task = None
+
+
+nats_publisher = NatsPublisher([NATS_URL])
+progress_publisher = ProgressQueuePublisher(nats_publisher)
 
 
 class DownloadTaskMiddleware(TaskiqMiddleware):
+    def __init__(
+        self, nats_publisher: NatsPublisher, progress_publisher: ProgressQueuePublisher
+    ):
+        self.nats_publisher = nats_publisher
+        self.progress_publisher = progress_publisher
+
+    async def startup(self):
+        await self.progress_publisher.start()
+
+    async def shutdown(self):
+        await self.nats_publisher.shutdown()
+        await self.progress_publisher.shutdown()
+
     async def pre_execute(
         self,
         message: "TaskiqMessage",
-    ) -> Union[
-        "TaskiqMessage",
-        "Coroutine[Any, Any, TaskiqMessage]",
-        "CoroutineType[Any, Any, TaskiqMessage]",
-    ]:
+    ) -> "TaskiqMessage":
         """
         This hook is called before executing task. This is a worker-side hook.
         """
@@ -42,7 +154,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
                 session.add(download_task)
                 session.commit()
                 session.refresh(download_task)
-                await publish_notification(
+                await self.nats_publisher.publish(
                     {
                         "type": "task",
                         "task": download_task.model_dump(
@@ -59,7 +171,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
         self,
         message: "TaskiqMessage",
         result: "TaskiqResult[Any]",
-    ) -> Union[None, Coroutine[Any, Any, None], "CoroutineType[Any, Any, None]"]:
+    ):
         """
         This hook executes after task is complete. This is a worker-side hook.
         """
@@ -76,7 +188,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
                 download_task.completed_at = datetime.now(timezone.utc)
                 session.add(download_task)
                 session.commit()
-                await publish_notification(
+                await self.nats_publisher.publish(
                     {
                         "type": "task",
                         "task": download_task.model_dump(
@@ -91,7 +203,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
         message: "TaskiqMessage",
         result: "TaskiqResult[Any]",
         exception: BaseException,
-    ) -> Union[None, Coroutine[Any, Any, None], "CoroutineType[Any, Any, None]"]:
+    ):
         logger.error(f"Task Error occurred: [{message.task_id}] {exception}")
         with Session(db.engine) as session:
             download_task = session.exec(
@@ -105,7 +217,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
                 session.add(download_task)
                 session.commit()
                 session.refresh(download_task)
-                await publish_notification(
+                await self.nats_publisher.publish(
                     {
                         "type": "task",
                         "task": download_task.model_dump(
@@ -119,25 +231,25 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
 broker = PullBasedJetStreamBroker(
     servers=[NATS_URL],
     queue="vpodcasts_download_queue",
-).with_middlewares(DownloadTaskMiddleware())
+).with_middlewares(DownloadTaskMiddleware(nats_publisher, progress_publisher))
 
 
 @broker.task
 async def add_video_task(youtube_url: str, download_task: DownloadTask):
-    async def publish_progress(progress: dict):
-        await publish_notification(
-            {
-                "type": "task",
-                "progress": progress,
-                "status": "progress",
-            }
-        )
+    await progress_publisher.start()
 
     def progress_cb(progress: dict):
         remove_keys = ["info_dict", "tmpfilename", "filename"]
         for k in remove_keys:
             progress.pop(k, None)
-            asyncio.create_task(publish_progress(progress))
+            progress_publisher.enqueue(
+                {
+                    "type": "task",
+                    "progress": progress,
+                    "task": download_task.model_dump(mode="json", exclude_unset=False),
+                    "status": "progress",
+                }
+            )
 
     return add_episode(youtube_url, progress_cb)
 
@@ -154,19 +266,3 @@ async def create_video_download_task(url: str):
         session.commit()
         logger.debug(f"Task created: {res.task_id}")
     return res
-
-
-async def get_nats_connection():
-    if nc.is_connected:
-        return nc
-    await nc.connect(NATS_URL)
-    return nc
-
-
-async def publish_notification(payload: Any, drain_after_publish: bool = False):
-    nc = await get_nats_connection()
-    await nc.publish("notification", json.dumps(payload).encode())
-    await nc.flush()
-    await nc.close()
-    if drain_after_publish:
-        await nc.drain()

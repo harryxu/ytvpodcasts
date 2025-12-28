@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react"
+import { useTaskStore } from "../stores"
+import type { DownloadTask } from "../types"
 
 export default function EventStream() {
   const esRef = useRef<EventSource | null>(null)
+  const taskStore = useTaskStore()
 
   useEffect(() => {
     if (esRef.current) return
@@ -12,7 +15,15 @@ export default function EventStream() {
     es.onmessage = event => {
       try {
         const data = JSON.parse(event.data)
-        console.log("Received stream data:", data)
+        switch (data.type) {
+          case "task":
+            const task: DownloadTask = { ...data.task }
+            if (data.progress) {
+              task.progress = { ...data.progress }
+            }
+            taskStore.updateTask(task)
+            break
+        }
       } catch (err) {
         console.error("Failed to parse stream data:", err)
       }

@@ -20,7 +20,26 @@ export const useDownloadTasksQuery = (enabled: boolean = true) => {
 
   useEffect(() => {
     if (!tasksQuery.isFetching && tasksQuery.data) {
-      setTasks(tasksQuery.data)
+      if (import.meta.env.PROD) {
+        setTasks(tasksQuery.data)
+      } else {
+        setTasks({
+          ...tasksQuery.data,
+          data: [
+            {
+              title: "Testing task",
+              status: "pending",
+              created_at: "2025-12-26T16:10:52.737290",
+              completed_at: "2025-12-26T16:11:17.173823",
+              id: 99999,
+              description: null,
+              updated_at: "2025-12-26T16:07:29.662624",
+              episode_id: null,
+            },
+            ...tasksQuery.data.data,
+          ],
+        })
+      }
     }
   }, [tasksQuery.isFetching, tasksQuery.data, setTasks])
 

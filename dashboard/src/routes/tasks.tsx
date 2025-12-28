@@ -14,16 +14,17 @@ import {
 import { CircleCheck, CircleX, RefreshCcw } from "lucide-react"
 
 import { createFileRoute } from "@tanstack/react-router"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { useDownloadTasksQuery } from "../api"
 import { useTaskStore } from "../stores"
+import type { DownloadTask } from "../types"
 
 export const Route = createFileRoute("/tasks")({
   component: TaskList,
 })
 
 function TaskList() {
-  const tasksQuery = useDownloadTasksQuery(false)
+  const tasksQuery = useDownloadTasksQuery()
   const taskStore = useTaskStore()
   const setAllowAutoUpdate = taskStore.setAllowAutoUpdate
 
@@ -53,24 +54,7 @@ function TaskList() {
         <CardContent>
           <List>
             {taskStore.tasks.map(item => (
-              <ListItem key={item.id} alignItems="flex-start">
-                <ListItemIcon>
-                  {item.status === "success" && <CircleCheck color="green" />}
-                  {item.status === "failed" && <CircleX color="red" />}
-                  {(item.status === "pending" ||
-                    item.status === "processing") && (
-                    <CircularProgress size={22} enableTrackSlot />
-                  )}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.title}
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      {item.description}
-                    </Typography>
-                  }
-                />
-              </ListItem>
+              <TaskItem key={item.id} task={item} />
             ))}
           </List>
         </CardContent>
@@ -78,3 +62,30 @@ function TaskList() {
     </Box>
   )
 }
+
+const TaskItem = React.memo(({ task }: { task: DownloadTask }) => {
+  return (
+    <ListItem key={task.id} alignItems="flex-start">
+      <ListItemIcon>
+        {task.status === "success" && <CircleCheck color="green" />}
+        {task.status === "failed" && <CircleX color="red" />}
+        {(task.status === "pending" || task.status === "processing") && (
+          <CircularProgress
+            size={22}
+            enableTrackSlot
+            variant={task.progress ? "determinate" : "indeterminate"}
+            value={task.progress ? task.progress._percent * 100 : undefined}
+          />
+        )}
+      </ListItemIcon>
+      <ListItemText
+        primary={task.title}
+        secondary={
+          <Typography variant="body2" color="text.secondary">
+            {task.description}
+          </Typography>
+        }
+      />
+    </ListItem>
+  )
+})

@@ -1,15 +1,15 @@
 # YTVPodcasts
 
-YTVPodcasts is a work in progress self-hosted tool for turning individual YouTube videos into a private podcast feed.
+YTVPodcasts is a work in progress self-hosted tool for turning individual videos into a private podcast feed.
 
 ## Overview
 
-The system provides a web-based dashboard where users can submit YouTube video URLs. Once submitted, the system automatically downloads the audio from the video in the background. It then generates an RSS feed for the downloaded audio, which you can subscribe to using any standard podcast client.
+The system provides a web-based dashboard where users can submit video URLs. Once submitted, the system automatically downloads the audio from the video in the background. It then generates an RSS feed for the downloaded audio, which you can subscribe to using any standard podcast client.
 
 ## Features
 
-- **Web Dashboard**: Simple interface to submit and manage YouTube video links.
-- **Background Processing**: Download YouTube videos using [yt-dlp](https://github.com/yt-dlp/yt-dlp) and converts them to audio in the background.
+- **Web Dashboard**: Simple interface to submit and manage video links.
+- **Background Processing**: Download videos using [yt-dlp](https://github.com/yt-dlp/yt-dlp) and converts them to audio in the background.
 - **RSS Feed Generation**: Instantly creates a podcast-compatible RSS feed for your downloaded content.
 - **Self-Hosted**: Run it on your own server for privacy and control.
 
@@ -37,6 +37,6 @@ Access http://localhost:5180/ to view the dashboard.
 
 ## Comparisons
 
-**YTVPodcasts** is designed for ad-hoc downloading of **single YouTube videos**.
+**YTVPodcasts** is designed for ad-hoc downloading of **single videos**.
 
-If you are looking for a solution to subscribe to and automatically download entire **YouTube channels** or playlists, we recommend using [Podsync](https://github.com/mxpv/podsync).
+If you are looking for a solution to subscribe to and automatically download entire **channels** or playlists, we recommend using [Podsync](https://github.com/mxpv/podsync).

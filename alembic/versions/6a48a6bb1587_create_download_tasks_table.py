@@ -8,9 +8,9 @@ Create Date: 2025-10-10 23:18:25.476386
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "6a48a6bb1587"
@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table(
         "download_tasks",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("queue_task_id", sa.String(100), unique=True, nullable=False),
+        sa.Column("queue_task_id", sa.String(100), unique=True, nullable=True),
         sa.Column("episode_id", sa.String(64), index=True, nullable=True),
         sa.Column("title", sa.String(100), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),

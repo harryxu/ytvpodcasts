@@ -16,6 +16,7 @@ export interface TaskStoreInterface {
   tasks: DownloadTask[]
   allowAutoUpdate: boolean
   setTasks: (tasks: DownloadTaskResponse) => void
+  updateTask: (task: DownloadTask) => void
   setNotifyCount: (count: number) => void
   setAllowAutoUpdate: (allow: boolean) => void
 }
@@ -26,11 +27,16 @@ const taskInitialState = {
   allowAutoUpdate: true,
 }
 
-export const useTaskStore = create<TaskStoreInterface>(set => ({
+export const useTaskStore = create<TaskStoreInterface>((set, get) => ({
   ...taskInitialState,
 
   setTasks: (tasks: DownloadTaskResponse) =>
     set({ tasks: tasks.data, notifyCount: tasks.notify_count }),
+
+  updateTask: (task: DownloadTask) =>
+    set(state => {
+      return { tasks: state.tasks.map(t => (t.id === task.id ? task : t)) }
+    }),
 
   setNotifyCount: (count: number) => set({ notifyCount: count }),
 

@@ -1,12 +1,15 @@
-import json
 import asyncio
+import json
 import math
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
+from loguru import logger
+from nats.aio.client import Client as NATS
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -14,31 +17,31 @@ import vpodcasts.database as db
 from vpodcasts.config import (
     BASE_URL,
     EPISODES_DIR,
+    NATS_URL,
     PODCAST_DESCRIPTION,
     PODCAST_TITLE,
-    NATS_URL,
 )
 from vpodcasts.database import engine
-from vpodcasts.huey_tasks import create_video_download_task
 from vpodcasts.models import Episode
-
-from nats.aio.client import Client as NATS
+from vpodcasts.taskiq_broker import broker as taskiq_broker
+from vpodcasts.taskiq_broker import create_video_download_task
 
 nc = NATS()
 
 
-app = FastAPI()
-templates = Jinja2Templates(directory="vpodcasts/templates")
-
-
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
     await nc.connect(NATS_URL)
+    await taskiq_broker.startup()
+    yield
+    # Shutdown
+    await nc.drain()
+    await taskiq_broker.shutdown()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    await nc.close()
+app = FastAPI(lifespan=lifespan)
+templates = Jinja2Templates(directory="vpodcasts/templates")
 
 
 @app.get("/")
@@ -64,10 +67,10 @@ class AddEpisodePayload(BaseModel):
 
 
 @app.post("/api/add")
-def add_episode(payload: AddEpisodePayload):
+async def add_episode(payload: AddEpisodePayload):
     if not payload.url:
         raise HTTPException(status_code=400, detail="Missing url")
-    create_video_download_task(payload.url)
+    await create_video_download_task(payload.url)
     return {"data": True}
 
 
@@ -171,6 +174,7 @@ async def subscribe():
 
     async def handler(msg):
         data = msg.data.decode()
+        logger.info(f"nats Received message: {data}")
         await queue.put(json.loads(data))
 
     sub = await nc.subscribe(subject, cb=handler)
@@ -179,7 +183,7 @@ async def subscribe():
         try:
             while True:
                 message = await queue.get()
-                yield json.dumps(message) + "\n"
+                yield "data: " + json.dumps(message) + "\n\n"
         except asyncio.CancelledError:
             pass
         finally:
@@ -187,5 +191,6 @@ async def subscribe():
 
     return StreamingResponse(
         event_stream(),
-        media_type="application/json",
+        # media_type="application/json",
+        media_type="text/event-stream",
     )

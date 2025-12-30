@@ -1,7 +1,5 @@
-from typing import Callable
 import os
-
-from typing import Any
+from typing import Any, Callable
 
 import click
 from yt_dlp import YoutubeDL
@@ -90,7 +88,7 @@ def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = N
 
     if db.episode_exists(info["id"]):
         error_message = (
-            f"Video '{info['title']}' already exists in the podcast. Skipping."
+            f"Video '{info.get('title')}' already exists in the podcast. Skipping."
         )
         click.echo(error_message)
         raise Exception(error_message)
@@ -123,7 +121,7 @@ def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = N
     }
 
     db.add_episode(episode_data)
-    click.echo(f"Added '{info['title']}' to the database.")
+    click.echo(f"Added '{info.get('title')}' to the database.")
     return episode_data
 
 
@@ -136,7 +134,7 @@ def create_ytdlp_command(command: list[str], youtube_url: str):
 
 @click.group()
 def cli():
-    """A command-line tool to generate a podcast RSS feed from YouTube videos."""
+    """A command-line tool to generate a podcast RSS feed from videos."""
     pass
 
 
@@ -149,7 +147,7 @@ def init():
 @cli.command()
 @click.argument("url")
 def add(url: str):
-    """Add a new YouTube video to the podcast."""
+    """Add a new video to the podcast."""
     add_episode(url)
 
 

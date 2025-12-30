@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { isValidUrl } from "../utils"
 
-describe("isYouTubeWatchUrl", () => {
-  it("should return true for valid youtube.com watch URLs", () => {
+describe("isVideoWatchUrl", () => {
+  it("should return true for valid video watch URLs", () => {
     expect(isValidUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toBe(true)
     expect(isValidUrl("https://youtube.com/watch?v=dQw4w9WgXcQ")).toBe(true)
   })
@@ -25,7 +25,7 @@ describe("isYouTubeWatchUrl", () => {
     ).toBe(true)
   })
 
-  it("should return false for non-youtube URLs", () => {
+  it("should return false for non-video URLs", () => {
     expect(isValidUrl("https://www.google.com")).toBe(false)
     expect(isValidUrl("https://vimeo.com/12345678")).toBe(false)
   })

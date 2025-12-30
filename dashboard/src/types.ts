@@ -23,6 +23,23 @@ export interface EpisodesResponse {
   data: Episode[]
   pagination: Pagination
 }
+export interface DownloadTaskProgress {
+  status: string
+  downloaded_bytes: number
+  total_bytes: number
+  eta: number
+  speed: number
+  elapsed: number
+  _eta_str: string
+  _speed_str: string
+  _percent: number
+  _percent_str: string
+  _total_bytes_str: string
+  _total_bytes_estimate_str: string
+  _downloaded_bytes_str: string
+  _elapsed_str: string
+  _default_template: string
+}
 
 export interface DownloadTask {
   completed_at: string | null
@@ -33,6 +50,7 @@ export interface DownloadTask {
   status: string
   title: string
   updated_at: string
+  progress?: DownloadTaskProgress
 }
 
 export interface DownloadTaskResponse {

@@ -6,14 +6,13 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
-import { useState } from "react"
-import CastInput from "../components/CastInput"
-import ToastContainer from "../components/toastify"
-import "../App.css"
-import TaskUpdater from "../components/TaskUpdater"
 import { Rss } from "lucide-react"
+import { useState } from "react"
+import "../App.css"
+import CastInput from "../components/CastInput"
 import EpisodePlayer from "../components/EpisodePlayer"
+import EventStream from "../components/EventStream"
+import ToastContainer from "../components/toastify"
 
 export const Route = createRootRoute({
   component: App,
@@ -57,7 +56,7 @@ function App() {
         </Stack>
       </Container>
       <EpisodePlayer />
-      <TaskUpdater />
+      <EventStream />
       <ToastContainer />
       {/* <TanStackRouterDevtools /> */}
     </>

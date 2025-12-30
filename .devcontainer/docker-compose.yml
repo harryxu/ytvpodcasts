@@ -18,6 +18,7 @@ services:
   nats:
     image: nats:alpine
     container_name: vpodcasts-dev-nats
+    command: ["-js"]
     networks:
       - vpodcasts-dev
 

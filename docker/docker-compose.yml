@@ -7,8 +7,8 @@ services:
       - ../data:/app/data
     environment:
       - BASE_URL=http://localhost:8089
-      - PODCAST_TITLE=My YouTube Podcast
-      - PODCAST_DESCRIPTION=A podcast generated from YouTube videos.
+      - PODCAST_TITLE=My Video Podcast
+      - PODCAST_DESCRIPTION=A podcast generated from videos.
       - PODCAST_LINK=https://github.com/your_repo
 
   nginx:

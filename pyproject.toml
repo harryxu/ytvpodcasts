@@ -1,7 +1,7 @@
 [project]
 name = "vpodcasts"
 version = "0.1.0"
-description = "YouTube as Podcast"
+description = "Private Podcast From Videos"
 requires-python = "==3.13.*"
 dependencies = [
   "feedgen>=1.0.0",
@@ -21,6 +21,10 @@ dependencies = [
   "httptools>=0.7.1",
   "nats-py>=2.12.0",
   "yt-dlp[default]>=2025.12.8",
+  "loguru>=0.7.3",
+  "taskiq>=0.12.1",
+  "taskiq-nats>=0.6.0",
+  "taskiq-fastapi>=0.4.0",
 ]
 
 [tool.uv]

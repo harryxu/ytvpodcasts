@@ -19,7 +19,7 @@ export default function CastInput() {
 
   const handleAdd = async () => {
     if (!isValidUrl(videoUrl)) {
-      toast.error("Video URL must be a youtube.com URL", {
+      toast.error("Video URL must be a valid Video URL", {
         position: "top-center",
         toastId: "error",
       })
@@ -38,7 +38,7 @@ export default function CastInput() {
     <Box sx={{ position: "relative" }}>
       <TextField
         disabled={createCastMutation.isPending}
-        label="YouTube URL"
+        label="Video URL"
         variant="outlined"
         fullWidth
         value={videoUrl}

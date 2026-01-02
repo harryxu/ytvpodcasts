@@ -2,6 +2,8 @@
 build/
 docker-compose.prod.yml
 
+.devcontainer/.env
+
 # Python virtual environment
 .venv/
 .venv*

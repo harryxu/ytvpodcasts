@@ -3,6 +3,8 @@ services:
   devcontainer:
     image: mcr.microsoft.com/devcontainers/python:3.13
     container_name: vpodcasts-dev
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
     volumes:
       - ..:/workspaces/vpodcasts:cached
     command: sleep infinity
@@ -18,6 +20,11 @@ services:
   nats:
     image: nats:alpine
     container_name: vpodcasts-dev-nats
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: ["-js"]
     networks:
       - vpodcasts-dev

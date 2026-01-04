@@ -74,7 +74,7 @@ const TaskItem = React.memo(({ task }: { task: DownloadTask }) => {
             size={22}
             enableTrackSlot
             variant={task.progress ? "determinate" : "indeterminate"}
-            value={task.progress ? task.progress._percent * 100 : undefined}
+            value={task.progress ? task.progress._percent : undefined}
           />
         )}
       </ListItemIcon>

@@ -1,10 +1,9 @@
 import asyncio
 import contextlib
 import json
-from collections.abc import Coroutine
+import time
 from datetime import datetime, timezone
-from types import CoroutineType
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from nats.aio.client import Client as NATS
 from sqlmodel import Session, select
@@ -181,13 +180,14 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
                     DownloadTask.queue_task_id == message.task_id
                 )
             ).first()
-            if download_task:
+            if download_task and download_task.status != "failed":
                 download_task.status = "success"
                 if result and isinstance(result, dict) and "id" in result:
                     download_task.episode_id = result["id"]
                 download_task.completed_at = datetime.now(timezone.utc)
                 session.add(download_task)
                 session.commit()
+                session.refresh(download_task)
                 await self.nats_publisher.publish(
                     {
                         "type": "task",
@@ -235,18 +235,25 @@ broker = PullBasedJetStreamBroker(
 
 
 def download_video_handler(youtube_url: str, download_task: DownloadTask):
+    last_publish_time = 0
+
     def progress_cb(progress: dict):
+        nonlocal last_publish_time
+        now = time.time()
+        if now - last_publish_time <= 0.5:
+            return
+        last_publish_time = now
         remove_keys = ["info_dict", "tmpfilename", "filename"]
         for k in remove_keys:
             progress.pop(k, None)
-            progress_publisher.enqueue(
-                {
-                    "type": "task",
-                    "progress": progress,
-                    "task": download_task.model_dump(mode="json", exclude_unset=False),
-                    "status": "progress",
-                }
-            )
+        progress_publisher.enqueue(
+            {
+                "type": "task",
+                "progress": progress,
+                "task": download_task.model_dump(mode="json", exclude_unset=False),
+                "status": "progress",
+            }
+        )
 
     return add_episode(youtube_url, progress_cb)
 

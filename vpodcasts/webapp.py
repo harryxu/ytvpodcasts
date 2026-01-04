@@ -174,7 +174,7 @@ async def subscribe():
 
     async def handler(msg):
         data = msg.data.decode()
-        logger.info(f"nats Received message: {data}")
+        # logger.info(f"nats Received message: {data}")
         await queue.put(json.loads(data))
 
     sub = await nc.subscribe(subject, cb=handler)

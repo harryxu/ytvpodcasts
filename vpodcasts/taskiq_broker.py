@@ -259,10 +259,16 @@ def download_video_handler(youtube_url: str, download_task: DownloadTask):
 
 
 @broker.task
-async def add_video_task(youtube_url: str, download_task: DownloadTask):
+async def add_video_task(youtube_url: str, download_task_id: int):
     await progress_publisher.start()
     loop = asyncio.get_running_loop()
-    await loop.run_in_executor(None, download_video_handler, youtube_url, download_task)
+
+    with Session(db.engine) as session:
+        download_task = session.get(DownloadTask, download_task_id)
+        if download_task is not None:
+            await loop.run_in_executor(
+                None, download_video_handler, youtube_url, download_task
+            )
 
 
 async def create_video_download_task(url: str):
@@ -271,7 +277,7 @@ async def create_video_download_task(url: str):
         session.add(task)
         session.commit()
         session.refresh(task)
-        res = await add_video_task.kiq(url, task)
+        res = await add_video_task.kiq(url, task.id)
         task.queue_task_id = res.task_id
         session.add(task)
         session.commit()

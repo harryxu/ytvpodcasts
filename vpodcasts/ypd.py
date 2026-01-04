@@ -95,8 +95,8 @@ def add_episode(youtube_url: str, progress_cb: Callable[[dict], None] | None = N
 
     audio_path = download_audio(youtube_url, info["id"], progress_cb)
 
-    audio_file_path = os.path.join(EPISODES_DIR, audio_path)
-    audio_file_size = os.path.getsize(audio_file_path)
+    audio_filename = os.path.join(EPISODES_DIR, audio_path)
+    audio_file_size = os.path.getsize(audio_filename)
     # Determine audio file type from file extension
     _, file_extension = os.path.splitext(audio_path)
     if file_extension == ".m4a":

@@ -22,6 +22,12 @@ export default function EventStream() {
               task.progress = { ...data.progress }
             }
             taskStore.updateTask(task)
+            console.log(
+              "Updated task:",
+              task.progress?._percent,
+              task.progress?._percent_str,
+              task
+            )
             break
         }
       } catch (err) {

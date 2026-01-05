@@ -4,8 +4,19 @@ from typing import Any
 from sqlmodel import create_engine, SQLModel, Session, select, func
 from vpodcasts.models import DownloadTask, Episode
 from vpodcasts.config import DB_FILE
+from sqlalchemy import event
 
-engine = create_engine(f"sqlite:///{DB_FILE}")
+engine = create_engine(
+    f"sqlite:///{DB_FILE}", connect_args={"check_same_thread": False}
+)
+
+
+# 定义一个监听器，在每次连接 SQLite 时执行 WAL 开启指令
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.close()
 
 
 def create_db_and_tables():

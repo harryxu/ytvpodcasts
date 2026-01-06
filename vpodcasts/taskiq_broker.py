@@ -176,7 +176,8 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
         """
         This hook executes after task is complete. This is a worker-side hook.
         """
-        if result == "skip":
+        return_value = result.value
+        if return_value == "skip":
             return
         with Session(db.engine) as session:
             download_task: DownloadTask | None = session.exec(
@@ -186,8 +187,12 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
             ).first()
             if download_task and download_task.status != "failed":
                 download_task.status = "success"
-                if result and isinstance(result, dict) and "id" in result:
-                    download_task.episode_id = result["id"]
+                if (
+                    return_value
+                    and isinstance(return_value, dict)
+                    and "id" in return_value
+                ):
+                    download_task.episode_id = return_value["id"]
                 download_task.completed_at = datetime.now(timezone.utc)
                 session.add(download_task)
                 session.commit()

@@ -51,6 +51,7 @@ def download_audio(
     output_template = os.path.join(EPISODES_DIR, "%(id)s.%(ext)s")
 
     ydl_opts: Any = {
+        "retries": 0,
         "final_ext": "mp3",
         "format": "bestaudio/best",
         "outtmpl": {"default": output_template},

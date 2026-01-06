@@ -1,10 +1,11 @@
+from vpodcasts.config import PROJECT_ROOT
+from filelock import Timeout, FileLock
 import asyncio
 import contextlib
 import json
-from collections.abc import Coroutine
+import time
 from datetime import datetime, timezone
-from types import CoroutineType
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from nats.aio.client import Client as NATS
 from sqlmodel import Session, select
@@ -149,7 +150,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
                     DownloadTask.queue_task_id == message.task_id
                 )
             ).first()
-            if download_task:
+            if download_task and download_task.status == "pending":
                 download_task.status = "processing"
                 session.add(download_task)
                 session.commit()
@@ -175,19 +176,22 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
         """
         This hook executes after task is complete. This is a worker-side hook.
         """
+        if result == "skip":
+            return
         with Session(db.engine) as session:
             download_task: DownloadTask | None = session.exec(
                 select(DownloadTask).where(
                     DownloadTask.queue_task_id == message.task_id
                 )
             ).first()
-            if download_task:
+            if download_task and download_task.status != "failed":
                 download_task.status = "success"
                 if result and isinstance(result, dict) and "id" in result:
                     download_task.episode_id = result["id"]
                 download_task.completed_at = datetime.now(timezone.utc)
                 session.add(download_task)
                 session.commit()
+                session.refresh(download_task)
                 await self.nats_publisher.publish(
                     {
                         "type": "task",
@@ -234,28 +238,50 @@ broker = PullBasedJetStreamBroker(
 ).with_middlewares(DownloadTaskMiddleware(nats_publisher, progress_publisher))
 
 
-def download_video_handler(youtube_url: str, download_task: DownloadTask):
+def download_video_handler(video_url: str, download_task: DownloadTask):
+    last_publish_time = 0
+
     def progress_cb(progress: dict):
+        nonlocal last_publish_time
+        now = time.time()
+        if now - last_publish_time <= 0.5:
+            return
+        last_publish_time = now
         remove_keys = ["info_dict", "tmpfilename", "filename"]
         for k in remove_keys:
             progress.pop(k, None)
-            progress_publisher.enqueue(
-                {
-                    "type": "task",
-                    "progress": progress,
-                    "task": download_task.model_dump(mode="json", exclude_unset=False),
-                    "status": "progress",
-                }
-            )
+        progress_publisher.enqueue(
+            {
+                "type": "task",
+                "progress": progress,
+                "task": download_task.model_dump(mode="json", exclude_unset=False),
+                "status": "progress",
+            }
+        )
 
-    return add_episode(youtube_url, progress_cb)
+    return add_episode(video_url, progress_cb)
 
 
 @broker.task
-async def add_video_task(youtube_url: str, download_task: DownloadTask):
-    await progress_publisher.start()
-    loop = asyncio.get_running_loop()
-    await loop.run_in_executor(None, download_video_handler, youtube_url, download_task)
+async def add_video_task(video_url: str, download_task_id: int):
+    logger.info(f"Processing download task {download_task_id}")
+    lock_file = str(PROJECT_ROOT / "data" / f"dl_{download_task_id}.lock")
+    lock = FileLock(lock_file, blocking=False)
+    try:
+        with lock:
+            with Session(db.engine) as session:
+                download_task = session.get(DownloadTask, download_task_id)
+                if download_task is not None:
+                    await progress_publisher.start()
+                    loop = asyncio.get_running_loop()
+                    await loop.run_in_executor(
+                        None, download_video_handler, video_url, download_task
+                    )
+    except Timeout:
+        logger.warning(
+            f"Download task {download_task_id} is already in progress, skipping"
+        )
+        return "skip"
 
 
 async def create_video_download_task(url: str):
@@ -264,7 +290,7 @@ async def create_video_download_task(url: str):
         session.add(task)
         session.commit()
         session.refresh(task)
-        res = await add_video_task.kiq(url, task)
+        res = await add_video_task.kiq(url, task.id)
         task.queue_task_id = res.task_id
         session.add(task)
         session.commit()

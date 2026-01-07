@@ -279,9 +279,10 @@ async def add_video_task(video_url: str, download_task_id: int):
                 if download_task is not None:
                     await progress_publisher.start()
                     loop = asyncio.get_running_loop()
-                    await loop.run_in_executor(
+                    result = await loop.run_in_executor(
                         None, download_video_handler, video_url, download_task
                     )
+                    return result
     except Timeout:
         logger.warning(
             f"Download task {download_task_id} is already in progress, skipping"

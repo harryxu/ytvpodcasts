@@ -176,7 +176,7 @@ class DownloadTaskMiddleware(TaskiqMiddleware):
         """
         This hook executes after task is complete. This is a worker-side hook.
         """
-        return_value = result.value
+        return_value = result.return_value
         if return_value == "skip":
             return
         with Session(db.engine) as session:

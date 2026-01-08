@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useTaskStore } from "../stores"
 import type { DownloadTask } from "../types"
+import { toast } from "react-toastify"
 
 export default function EventStream() {
   const esRef = useRef<EventSource | null>(null)
@@ -22,6 +23,9 @@ export default function EventStream() {
               task.progress = { ...data.progress }
             }
             taskStore.updateTask(task)
+            if (task.status === "success") {
+              toast.success(`${task.title} downloaded successfully.`)
+            }
             console.log(
               "Updated task:",
               task.progress?._percent,

@@ -23,8 +23,13 @@ export default function EventStream() {
               task.progress = { ...data.progress }
             }
             taskStore.updateTask(task)
-            if (task.status === "success") {
-              toast.success(`${task.title} downloaded successfully.`)
+            switch (task.status) {
+              case "success":
+                toast.success(`${task.title} downloaded successfully.`)
+                break
+              case "failed":
+                toast.error(task.description)
+                break
             }
             console.log(
               "Updated task:",

@@ -52,6 +52,7 @@ def download_audio(
 
     ydl_opts: Any = {
         "retries": 0,
+        "noplaylist": True,
         "final_ext": "mp3",
         "format": "bestaudio/best",
         "outtmpl": {"default": output_template},

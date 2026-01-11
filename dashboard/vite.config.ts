@@ -29,7 +29,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    outDir: "../data/dashboard",
-  },
 })

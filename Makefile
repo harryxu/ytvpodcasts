@@ -17,12 +17,13 @@ dashboard:
 		node:24-alpine \
 	  sh -c "cd /app/dashboard && corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run build"
 
-.PHONY: all
-all: dashboard docker
 
 .PHONY: docker
 docker:
 	docker build -f docker/Dockerfile -t vpodcasts:latest .
+
+.PHONY: all
+all: dashboard docker
 
 # dev container commands
 .PHONY: devcontainer-up

@@ -11,13 +11,14 @@ RUN apt-get update && apt-get install -y ffmpeg
 # Copy dependency files and install them
 # This is done in a separate step to leverage Docker layer caching.
 COPY pyproject.toml uv.lock ./
-RUN uv sync 
+RUN uv sync
 
 # Copy the rest of the application files
 COPY alembic.ini .
 COPY alembic/ ./alembic/
 COPY vpodcasts/ ./vpodcasts/
 COPY manager.py .
+COPY dashboard/dist/ ./app/dashboard/
 
 RUN mkdir data
 

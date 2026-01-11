@@ -1,19 +1,3 @@
-.PHONY: dashboard
-dashboard:
-	cd dashboard && pnpm run build
-
-.PHONY: all
-all: dashboard docker
-
-.PHONY: huey
-huey:
-	# Run huey consumer as a task queue.
-	uv run huey_consumer vpodcasts.huey_tasks.huey -w 1
-
-.PHONY: devweb
-devweb:
-	un run manager.py web
-
 .PHONY: startdev
 startdev: migratedb
 	# Run all services with honcho from Procfile on development environment.
@@ -25,13 +9,20 @@ migratedb:
 	@echo "Starting database migration..."
 	uv run alembic upgrade head
 
+.PHONY: dashboard
+dashboard:
+	docker run --rm \
+		-v "$$PWD:/app" \
+		-w /app \
+		node:24-alpine \
+	  sh -c "cd /app/dashboard && corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run build"
+
+.PHONY: all
+all: dashboard docker
+
 .PHONY: docker
 docker:
 	docker build -f docker/Dockerfile -t vpodcasts:latest .
-
-.PHONY: run-docker
-run-docker:
-	cd docker && docker-compose up
 
 # dev container commands
 .PHONY: devcontainer-up

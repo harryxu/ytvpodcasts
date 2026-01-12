@@ -3,6 +3,7 @@ build/
 docker-compose.prod.yml
 
 .devcontainer/.env
+dashboard-dist/
 
 # Python virtual environment
 .venv/

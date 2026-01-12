@@ -5,6 +5,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
@@ -16,6 +17,7 @@ from sqlmodel import Session, select
 import vpodcasts.database as db
 from vpodcasts.config import (
     BASE_URL,
+    DASHBOARD_DIST_DIR,
     EPISODES_DIR,
     NATS_URL,
     PODCAST_DESCRIPTION,
@@ -54,6 +56,15 @@ def rss():
     # Provide the RSS feed dynamically
     rss_feed = generate_rss_feed()
     return Response(content=rss_feed, media_type="application/xml")
+
+
+app.mount("/static", StaticFiles(directory=DASHBOARD_DIST_DIR), name="static")
+
+
+@app.get("/dashboard")
+@app.get("/dashboard/{path:path}")
+async def dashboard(path: str):
+    return FileResponse(DASHBOARD_DIST_DIR / "index.html")
 
 
 @app.get("/episodes/{filename:path}")

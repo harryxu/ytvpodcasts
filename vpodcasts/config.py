@@ -16,6 +16,7 @@ NATS_URL = os.getenv("NATS_URL", "nats://nats:4222")
 
 # --- File and Directory Paths ---
 EPISODES_DIR = os.getenv("EPISODES_DIR", str(PROJECT_ROOT / "data" / "episodes"))
+DASHBOARD_DIST_DIR = str(PROJECT_ROOT / "../dashboard-dist")
 
 # --- Podcast Configuration ---
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")

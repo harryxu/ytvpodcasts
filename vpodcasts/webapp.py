@@ -63,8 +63,13 @@ app.mount("/static", StaticFiles(directory=DASHBOARD_DIST_DIR), name="static")
 
 @app.get("/dashboard")
 @app.get("/dashboard/{path:path}")
-async def dashboard(path: str):
-    return FileResponse(DASHBOARD_DIST_DIR / "index.html")
+async def dashboard(path: str = ""):
+    return FileResponse(f"{DASHBOARD_DIST_DIR}/index.html")
+
+
+@app.get("/assets/{path:path}")
+async def assets(path: str = ""):
+    return FileResponse(f"{DASHBOARD_DIST_DIR}/assets/{path}")
 
 
 @app.get("/episodes/{filename:path}")

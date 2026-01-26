@@ -11,7 +11,7 @@ engine = create_engine(
 )
 
 
-# 定义一个监听器，在每次连接 SQLite 时执行 WAL 开启指令
+# Execute PRAGMA journal_mode=WAL on every connection
 @event.listens_for(engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()

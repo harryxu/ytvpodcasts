@@ -12,6 +12,7 @@ migratedb:
 .PHONY: dashboard
 dashboard:
 	docker run --rm \
+		-e CI=true \
 		-v "$$PWD:/app" \
 		-w /app \
 		node:24-alpine \

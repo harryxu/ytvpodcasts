@@ -22,7 +22,7 @@ services:
     command: ["-js"]
 
   nginx:
-    image: nginx:latest
+    image: nginx:stable-alpine-slim
     container_name: vpodcasts-nginx
     ports:
       - "8089:80"

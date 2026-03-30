@@ -18,7 +18,7 @@ COPY alembic.ini .
 COPY alembic/ ./alembic/
 COPY vpodcasts/ ./vpodcasts/
 COPY manager.py .
-COPY dashboard/dist/ ./app/dashboard/
+COPY dashboard-dist/ ./dashboard-dist/
 
 RUN mkdir data
 

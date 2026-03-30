@@ -11,8 +11,19 @@ services:
       - PODCAST_DESCRIPTION=A podcast generated from videos.
       - PODCAST_LINK=https://github.com/your_repo
 
+  nats:
+    image: nats:alpine
+    container_name: vpodcasts-nats
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command: ["-js"]
+
   nginx:
     image: nginx:latest
+    container_name: vpodcasts-nginx
     ports:
       - "8089:80"
     volumes:

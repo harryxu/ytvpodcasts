@@ -19,17 +19,4 @@ server {
         alias /app/data/episodes/;
         try_files $uri =404;
     }
-
-    location /dashboard/ {
-        root /app/data;
-        try_files $uri $uri/ /dashboard/index.html;
-        index index.html;
-    }
-    location = /dashboard {
-        return 301 /dashboard/;
-    }
-
-    location /assets/ {
-        root /app/data/dashboard;
-    }
 }

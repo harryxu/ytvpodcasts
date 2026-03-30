@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Determine the project root directory
 # This assumes config.py is inside a package (e.g., vpodcasts/)

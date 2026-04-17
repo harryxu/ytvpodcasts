@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 100px;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 24px 0 16px;
+
+  .rss-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}

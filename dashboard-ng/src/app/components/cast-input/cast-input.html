@@ -1,0 +1,30 @@
+<div class="cast-input-wrapper">
+  <mat-form-field appearance="outline" class="url-field">
+    <mat-label>Video URL</mat-label>
+    <input
+      #urlInput
+      matInput
+      type="url"
+      [value]="videoUrl()"
+      (input)="videoUrl.set(urlInput.value)"
+      (keydown)="onKeydown($event)"
+      [disabled]="mutation.isPending()"
+      placeholder="https://..."
+    />
+  </mat-form-field>
+
+  <div class="action-area">
+    @if (mutation.isPending()) {
+      <mat-spinner diameter="32"></mat-spinner>
+    } @else {
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="videoUrl().trim() === ''"
+        (click)="handleAdd()"
+      >
+        Add
+      </button>
+    }
+  </div>
+</div>

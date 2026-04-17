@@ -1,0 +1,40 @@
+<div class="container">
+  <h1 class="app-title">
+    VPodcasts
+    <a href="/rss" target="_blank" class="rss-link">
+      <lucide-icon [img]="RssIcon" color="orange" size="20" />
+    </a>
+  </h1>
+
+  <div class="content-stack">
+    <app-cast-input />
+
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+      <a
+        mat-tab-link
+        routerLink="/"
+        routerLinkActive
+        #episodesLink="routerLinkActive"
+        [active]="episodesLink.isActive"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Episodes
+      </a>
+      <a
+        mat-tab-link
+        routerLink="/tasks"
+        routerLinkActive
+        #tasksLink="routerLinkActive"
+        [active]="tasksLink.isActive"
+      >
+        Tasks
+      </a>
+    </nav>
+
+    <mat-tab-nav-panel #tabPanel>
+      <router-outlet />
+    </mat-tab-nav-panel>
+  </div>
+</div>
+
+<app-episode-player />

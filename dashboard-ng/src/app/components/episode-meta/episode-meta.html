@@ -1,0 +1,34 @@
+<div class="meta-container">
+  <div class="duration">
+    <lucide-icon [img]="ClockIcon" size="10" color="#9e9e9e" />
+    <span class="duration-text">
+      @if (duration.hours > 0) {
+        {{ duration.hours.toString().padStart(2, '0') }}:
+      }{{ duration.minutes.toString().padStart(2, '0') }}:{{ duration.seconds.toString().padStart(2, '0') }}
+    </span>
+  </div>
+
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="episodeMenu"
+    [disabled]="isPending()"
+    class="meta-btn"
+  >
+    @if (isPending()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      <lucide-icon [img]="EllipsisIcon" size="15" color="#9e9e9e" />
+    }
+  </button>
+</div>
+
+<mat-menu #episodeMenu="matMenu">
+  <button mat-menu-item (click)="archiveEpisode()">
+    <lucide-icon [img]="ArchiveIcon" size="16" />
+    <span>Archive</span>
+  </button>
+  <button mat-menu-item (click)="deleteEpisode()" class="delete-item">
+    <lucide-icon [img]="TrashIcon" size="16" color="#c62828" />
+    <span style="color: #c62828">Delete</span>
+  </button>
+</mat-menu>

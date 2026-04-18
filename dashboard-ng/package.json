@@ -25,6 +25,24 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@parcel/watcher",
+      "lmdb",
+      "msgpackr-extract"
+    ],
+    "supportedArchitectures": {
+      "os": [
+        "linux",
+        "darwin"
+      ],
+      "cpu": [
+        "arm64",
+        "x64"
+      ]
+    }
+  },
   "devDependencies": {
     "@angular/build": "^21.2.7",
     "@angular/cli": "^21.2.7",

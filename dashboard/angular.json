@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "dashboard-ng": {
+    "dashboard": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -68,10 +68,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "dashboard-ng:build:production"
+              "buildTarget": "dashboard:build:production"
             },
             "development": {
-              "buildTarget": "dashboard-ng:build:development"
+              "buildTarget": "dashboard:build:development"
             }
           },
           "defaultConfiguration": "development"

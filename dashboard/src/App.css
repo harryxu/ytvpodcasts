@@ -1,8 +1,0 @@
-.Toastify {
-  .Toastify__toast-container {
-    .Toastify__toast {
-      animation-duration: 300ms;
-      font-weight: 500;
-    }
-  }
-}

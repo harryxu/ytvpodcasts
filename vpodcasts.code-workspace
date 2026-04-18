@@ -1,13 +1,10 @@
 {
   "folders": [
     {
-      "path": "dashboard"
-    },
-    {
-      "path": "dashboard-ng"
-    },
-    {
       "path": "."
+    },
+    {
+      "path": "dashboard"
     }
   ],
   "settings": {

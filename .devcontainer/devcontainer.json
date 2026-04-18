@@ -18,7 +18,7 @@
   },
   "remoteUser": "vscode",
   // "postCreateCommand": "uv sync && cd dashboard && pnpm install",
-  "postCreateCommand": "uv sync && cd dashboard-ng && pnpm install",
+  "postCreateCommand": "uv sync && cd dashboard && pnpm install",
   "customizations": {
     "vscode": {
       "extensions": [

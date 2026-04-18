@@ -1,0 +1,70 @@
+<mat-card appearance="outlined">
+  <mat-card-content>
+    @if (episodesQuery.isPending()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40" />
+      </div>
+    }
+
+    @if (episodesQuery.data()) {
+      <mat-list>
+        @for (episode of episodesQuery.data()!.data; track episode.id) {
+          <mat-list-item class="episode-item">
+            <div class="episode-content">
+              <div class="episode-avatar-wrapper">
+                <div class="episode-avatar">
+                  @if (episode.thumbnail) {
+                    <img [src]="episode.thumbnail" [alt]="episode.title" class="avatar-img" />
+                  } @else {
+                    <div class="avatar-placeholder"></div>
+                  }
+
+                  <div
+                    class="btn-play"
+                    [class.playing]="isPlaying(episode)"
+                    (click)="togglePlay(episode)"
+                  >
+                    @if (isPlaying(episode)) {
+                      <lucide-icon [img]="AudioLinesIcon" size="20" color="#ffffff" />
+                    } @else {
+                      <lucide-icon [img]="PlayIcon" size="20" color="rgba(255,255,255,0.56)" />
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="episode-body">
+                <div class="episode-header">
+                  <span class="episode-title">{{ episode.title }}</span>
+                  <app-episode-meta [episode]="episode" />
+                </div>
+
+                <p
+                  class="episode-description"
+                  [title]="episode.description"
+                >
+                  {{ episode.description }}
+                </p>
+              </div>
+            </div>
+          </mat-list-item>
+        }
+      </mat-list>
+
+      @if (totalPages() > 1) {
+        <mat-paginator
+          [length]="totalItems()"
+          [pageSize]="perPage"
+          [pageIndex]="currentPage() - 1"
+          [showFirstLastButtons]="true"
+          [hidePageSize]="true"
+          (page)="onPageChange($event)"
+        />
+      }
+    }
+
+    @if (episodesQuery.isError()) {
+      <p class="error-message">Failed to load episodes. Please try again.</p>
+    }
+  </mat-card-content>
+</mat-card>

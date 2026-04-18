@@ -1,0 +1,65 @@
+<div class="tasks-container">
+  <div class="tasks-toolbar">
+    <button
+      mat-icon-button
+      (click)="refetch()"
+      [disabled]="tasksQuery.isRefetching()"
+      title="Refresh"
+    >
+      <lucide-icon [img]="RefreshCcwIcon" size="20" />
+    </button>
+  </div>
+
+  @if (tasksQuery.isLoading()) {
+    <div class="loading-center">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else {
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <mat-list>
+          @for (task of taskStore.tasks(); track task.id) {
+            <mat-list-item class="task-item">
+              <div matListItemIcon class="task-icon">
+                @switch (taskStatus(task)) {
+                  @case ('success') {
+                    <lucide-icon [img]="CircleCheckIcon" size="22" color="green" />
+                  }
+                  @case ('failed') {
+                    <lucide-icon [img]="CircleXIcon" size="22" color="red" />
+                  }
+                  @default {
+                    <mat-progress-spinner
+                      diameter="22"
+                      [mode]="task.progress ? 'determinate' : 'indeterminate'"
+                      [value]="progressValue(task)"
+                    />
+                  }
+                }
+              </div>
+
+              <span matListItemTitle class="task-title">{{ task.title }}</span>
+
+              @if (task.description) {
+                <span matListItemLine class="task-desc">{{ task.description }}</span>
+              }
+
+              @if (task.progress && taskStatus(task) === 'progress') {
+                <span matListItemLine class="task-progress">
+                  {{ task.progress._percent_str }} &mdash; {{ task.progress._speed_str }}
+                  @if (task.progress._eta_str) {
+                    &mdash; ETA: {{ task.progress._eta_str }}
+                  }
+                </span>
+              }
+            </mat-list-item>
+          } @empty {
+            <mat-list-item>
+              <span matListItemTitle class="empty-text">No tasks found.</span>
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

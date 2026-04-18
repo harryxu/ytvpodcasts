@@ -1,7 +1,11 @@
 {
   "folders": [
-    { "path": "." },
-    { "path": "dashboard" }
+    {
+      "path": "."
+    },
+    {
+      "path": "dashboard"
+    }
   ],
   "settings": {
     "git.ignoreLimitWarning": true

@@ -1,0 +1,35 @@
+.meta-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.duration {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.duration-text {
+  font-size: 0.75rem;
+  color: #9e9e9e;
+}
+
+.meta-btn {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.delete-item {
+  color: #c62828;
+}

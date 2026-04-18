@@ -17,6 +17,7 @@
     "UV_PROJECT_ENVIRONMENT": ".venv-devcontainer"
   },
   "remoteUser": "vscode",
+  // "postCreateCommand": "uv sync && cd dashboard && pnpm install",
   "postCreateCommand": "uv sync && cd dashboard && pnpm install",
   "customizations": {
     "vscode": {

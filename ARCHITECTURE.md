@@ -1,6 +1,6 @@
-# GEMINI.md for VPodcasts project.
+# VPodcasts project.
 
-## Gemini Project Workflow: Git Commit
+## Project Workflow: Git Commit
 
 **Objective:** To automate the process of creating a Git commit based on the current file changes.
 
@@ -15,8 +15,12 @@
 5.  **Execute Commit:** Run `git commit -m "..."` with the generated message.
 6.  **Confirm:** Run `git status` again to confirm the commit was successful.
 
-## Gemini Added Memories
+## Python package
 - use uv to install python dependencies
+- `uv tree --outdated --depth=1` for check python package version
+
+### Bump pyproject.toml dependency minimum versions to latest feasible version
+- `uvx uv-bump`
 
 ## Directory: `dashboard/`
 
@@ -24,8 +28,8 @@ This directory contains the source code for the podcast's web administration int
 
 ### Technology Stack
 
-*   **Framework/Library**: React.js
-*   **UI Components**: Material-UI (MUI)
+*   **Framework/Library**: Angular
+*   **UI Components**: Angular Material
 *   **Package Manager**: pnpm
 
 ### Testing

@@ -1,80 +1,67 @@
-import { Component, input, signal, inject, computed } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
-import { injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental'
-import { lastValueFrom } from 'rxjs'
-import { MatIconButton } from '@angular/material/button'
-import { MatMenuModule } from '@angular/material/menu'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { LucideAngularModule, Ellipsis, Archive, Trash, Clock } from 'lucide-angular'
-import { NotificationService } from '../../services/notification.service'
-import type { Episode } from '../../types'
+import { Component, input, signal, inject, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { injectMutation, QueryClient } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LucideAngularModule, Ellipsis, Archive, Trash, Clock } from 'lucide-angular';
+import { NotificationService } from '../../services/notification.service';
+import type { Episode } from '../../types';
 
 @Component({
   selector: 'app-episode-meta',
   standalone: true,
-  imports: [
-    MatIconButton,
-    MatMenuModule,
-    MatProgressSpinnerModule,
-    LucideAngularModule,
-  ],
+  imports: [MatIconButton, MatMenuModule, MatProgressSpinnerModule, LucideAngularModule],
   templateUrl: './episode-meta.html',
   styleUrl: './episode-meta.scss',
 })
 export class EpisodeMetaComponent {
-  episode = input.required<Episode>()
+  episode = input.required<Episode>();
 
-  private http = inject(HttpClient)
-  private notification = inject(NotificationService)
-  private queryClient = injectQueryClient()
+  private http = inject(HttpClient);
+  private notification = inject(NotificationService);
+  private queryClient = inject(QueryClient);
 
-  readonly EllipsisIcon = Ellipsis
-  readonly ArchiveIcon = Archive
-  readonly TrashIcon = Trash
-  readonly ClockIcon = Clock
+  readonly EllipsisIcon = Ellipsis;
+  readonly ArchiveIcon = Archive;
+  readonly TrashIcon = Trash;
+  readonly ClockIcon = Clock;
 
   archiveMutation = injectMutation(() => ({
-    mutationFn: () =>
-      lastValueFrom(this.http.post(`/api/episodes/${this.episode().id}/archive`, {})),
+    mutationFn: () => lastValueFrom(this.http.post(`/api/episodes/${this.episode().id}/archive`, {})),
     onSuccess: () => {
-      this.queryClient.invalidateQueries({ queryKey: ['episodesList'] })
-      this.notification.success('Episode has been archived.')
+      this.queryClient.invalidateQueries({ queryKey: ['episodesList'] });
+      this.notification.success('Episode has been archived.');
     },
-  }))
+  }));
 
   deleteMutation = injectMutation(() => ({
-    mutationFn: () =>
-      lastValueFrom(this.http.delete(`/api/episodes/${this.episode().id}`)),
+    mutationFn: () => lastValueFrom(this.http.delete(`/api/episodes/${this.episode().id}`)),
     onSuccess: () => {
-      this.queryClient.invalidateQueries({ queryKey: ['episodesList'] })
-      this.notification.success('Episode has been deleted.')
+      this.queryClient.invalidateQueries({ queryKey: ['episodesList'] });
+      this.notification.success('Episode has been deleted.');
     },
-  }))
+  }));
 
-  isPending = computed(
-    () => this.archiveMutation.isPending() || this.deleteMutation.isPending(),
-  )
+  isPending = computed(() => this.archiveMutation.isPending() || this.deleteMutation.isPending());
 
   get duration(): { hours: number; minutes: number; seconds: number } {
-    const d = this.episode().duration
+    const d = this.episode().duration;
     return {
       hours: Math.floor(d / 3600),
       minutes: Math.floor((d % 3600) / 60),
       seconds: Math.floor(d % 60),
-    }
+    };
   }
 
   archiveEpisode(): void {
-    this.archiveMutation.mutate()
+    this.archiveMutation.mutate();
   }
 
   deleteEpisode(): void {
-    if (
-      window.confirm(
-        'Are you sure you want to delete this episode? This action cannot be undone.',
-      )
-    ) {
-      this.deleteMutation.mutate()
+    if (window.confirm('Are you sure you want to delete this episode? This action cannot be undone.')) {
+      this.deleteMutation.mutate();
     }
   }
 }

@@ -1,7 +1,14 @@
 {
   "folders": [
-    { "path": "." },
-    { "path": "dashboard" }
+    {
+      "path": "dashboard"
+    },
+    {
+      "path": "dashboard-ng"
+    },
+    {
+      "path": "."
+    }
   ],
   "settings": {
     "git.ignoreLimitWarning": true

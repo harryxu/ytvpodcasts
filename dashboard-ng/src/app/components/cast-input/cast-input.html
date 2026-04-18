@@ -18,7 +18,7 @@
       <mat-spinner diameter="32"></mat-spinner>
     } @else {
       <button
-        mat-raised-button
+        matButton="filled"
         color="primary"
         [disabled]="videoUrl().trim() === ''"
         (click)="handleAdd()"

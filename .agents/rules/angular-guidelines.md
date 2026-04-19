@@ -120,6 +120,10 @@ Here is a link to the most recent Angular style guide https://angular.dev/style-
 - Use built in pipes and import pipes when being used in a template, learn more https://angular.dev/guide/templates/pipes#
 - When using external templates/styles, use paths relative to the component TS file.
 
+### Style Best Practices
+
+- Avoid using !important in CSS unless absolutely necessary.
+
 ### Services
 
 - Design services around a single responsibility

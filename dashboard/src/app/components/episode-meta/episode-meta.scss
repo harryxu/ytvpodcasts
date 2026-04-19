@@ -22,11 +22,16 @@
 .meta-btn {
   width: 28px;
   height: 28px;
-  line-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  ::ng-deep .mat-mdc-button-touch-target {
-    width: 28px;
-    height: 28px;
+  ::ng-deep lucide-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
   }
 }
 

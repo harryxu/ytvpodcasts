@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>{{ episode.title }}</h2>
+
+<mat-dialog-content>
+  <div class="episode-details">
+    @if (episode.thumbnail) {
+      <img [src]="episode.thumbnail" [alt]="episode.title" class="episode-thumbnail" />
+    }
+
+    <dl class="episode-facts">
+      <div class="fact-item">
+        <dt>Duration</dt>
+        <dd>{{ formatDuration(episode.duration) }}</dd>
+      </div>
+
+      <div class="fact-item">
+        <dt>Created</dt>
+        <dd>{{ episode.create_date | date: 'medium' }}</dd>
+      </div>
+
+      <div class="fact-item">
+        <dt>Uploaded</dt>
+        <dd>{{ episode.upload_date | date: 'medium' }}</dd>
+      </div>
+
+      <div class="fact-item">
+        <dt>Audio Type</dt>
+        <dd>{{ episode.audio_file_type }}</dd>
+      </div>
+
+      <div class="fact-item">
+        <dt>Audio Size</dt>
+        <dd>{{ episode.audio_file_size | number }} bytes</dd>
+      </div>
+    </dl>
+
+    @if (episode.description) {
+      <section class="episode-section">
+        <h3>Description</h3>
+        <p>{{ episode.description }}</p>
+      </section>
+    }
+
+    @if (episode.webpage_url) {
+      <section class="episode-section">
+        <h3>Source</h3>
+        <a [href]="episode.webpage_url" target="_blank" rel="noreferrer">
+          {{ episode.webpage_url }}
+        </a>
+      </section>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

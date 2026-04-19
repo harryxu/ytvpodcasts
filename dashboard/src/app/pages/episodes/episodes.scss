@@ -89,9 +89,20 @@
 }
 
 .episode-title {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
   font-size: 1.1rem;
   font-weight: 500;
   line-height: 1.4;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .episode-description {

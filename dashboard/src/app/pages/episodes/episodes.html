@@ -35,7 +35,13 @@
 
               <div class="episode-body">
                 <div class="episode-header">
-                  <span class="episode-title">{{ episode.title }}</span>
+                  <button
+                    type="button"
+                    class="episode-title"
+                    (click)="openEpisodeDetails(episode)"
+                  >
+                    {{ episode.title }}
+                  </button>
                   <app-episode-meta [episode]="episode" />
                 </div>
 

@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs'
 import { injectQuery } from '@tanstack/angular-query-experimental'
 import { MatCardModule } from '@angular/material/card'
+import { MatDialog } from '@angular/material/dialog'
 import { MatListModule } from '@angular/material/list'
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
@@ -16,6 +17,7 @@ import { LucideAngularModule, Play, AudioLines } from 'lucide-angular'
 import { AppStore } from '../../stores'
 import type { Episode, EpisodesResponse } from '../../types'
 import { EpisodeMetaComponent } from '../../components/episode-meta/episode-meta'
+import { EpisodeDetailsDialogComponent } from '../../components/episode-details-dialog/episode-details-dialog'
 
 @Component({
   selector: 'app-episodes',
@@ -33,6 +35,7 @@ import { EpisodeMetaComponent } from '../../components/episode-meta/episode-meta
 })
 export class EpisodesComponent {
   private http = inject(HttpClient)
+  private dialog = inject(MatDialog)
   appStore = inject(AppStore)
 
   readonly PlayIcon = Play
@@ -87,6 +90,15 @@ export class EpisodesComponent {
     } else {
       this.appStore.setPlayingEpisode(episode)
     }
+  }
+
+  openEpisodeDetails(episode: Episode): void {
+    this.dialog.open(EpisodeDetailsDialogComponent, {
+      data: episode,
+      maxWidth: '720px',
+      width: 'calc(100vw - 32px)',
+      autoFocus: false,
+    })
   }
 
   onPageChange(event: PageEvent): void {

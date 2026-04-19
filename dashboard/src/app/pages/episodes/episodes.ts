@@ -11,6 +11,7 @@ import { injectQuery } from '@tanstack/angular-query-experimental'
 import { MatCardModule } from '@angular/material/card'
 import { MatDialog } from '@angular/material/dialog'
 import { MatListModule } from '@angular/material/list'
+import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { LucideAngularModule, Play, AudioLines } from 'lucide-angular'
@@ -27,6 +28,7 @@ import { EpisodeDetailsDialogComponent } from '../../components/episode-details-
     MatListModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    MatButtonToggleModule,
     LucideAngularModule,
     EpisodeMetaComponent,
   ],
@@ -43,13 +45,18 @@ export class EpisodesComponent {
 
   readonly perPage = 8
   currentPage = signal(1)
+  statusFilter = signal<'default' | 'archived' | 'all'>('default')
 
   episodesQuery = injectQuery(() => ({
-    queryKey: ['episodesList', this.currentPage()],
+    queryKey: ['episodesList', this.currentPage(), this.statusFilter()],
     queryFn: async (): Promise<EpisodesResponse> => {
       const data = await lastValueFrom(
         this.http.get<EpisodesResponse>('/api/episodes', {
-          params: { page: this.currentPage(), per_page: this.perPage },
+          params: {
+            page: this.currentPage(),
+            per_page: this.perPage,
+            status: this.statusFilter(),
+          },
         }),
       )
       if (isDevMode()) {
@@ -103,6 +110,11 @@ export class EpisodesComponent {
 
   onPageChange(event: PageEvent): void {
     this.currentPage.set(event.pageIndex + 1)
+  }
+
+  onStatusChange(status: 'default' | 'archived' | 'all'): void {
+    this.statusFilter.set(status)
+    this.currentPage.set(1)
   }
 
   formatDuration(seconds: number): string {

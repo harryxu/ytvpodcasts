@@ -1,3 +1,11 @@
+<div class="filters-container">
+  <mat-button-toggle-group [value]="statusFilter()" (change)="onStatusChange($event.value)">
+    <mat-button-toggle value="default">Default</mat-button-toggle>
+    <mat-button-toggle value="archived">Archived</mat-button-toggle>
+    <mat-button-toggle value="all">All</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+
 <mat-card appearance="outlined">
   <mat-card-content>
     @if (episodesQuery.isPending()) {

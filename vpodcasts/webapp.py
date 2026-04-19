@@ -91,8 +91,15 @@ async def add_episode(payload: AddEpisodePayload):
 
 
 @app.get("/api/episodes")
-def get_episodes(page: int = 1, per_page: int = 10):
-    episodes, total_items = db.get_episodes(page=page, per_page=per_page)
+def get_episodes(page: int = 1, per_page: int = 10, status: str = "default"):
+    if status == "archived":
+        is_archived: bool | None = True
+    elif status == "all":
+        is_archived = None
+    else:
+        is_archived = False
+
+    episodes, total_items = db.get_episodes(page=page, per_page=per_page, is_archived=is_archived)
     total_pages = math.ceil(total_items / per_page)
     return {
         "data": [episode.model_dump(mode="json") for episode in episodes],

@@ -40,21 +40,25 @@ def get_all_episodes(is_archived: bool = False):
         return episodes
 
 
-def get_episodes(page: int = 1, per_page: int = 10, is_archived: bool = False):
+def get_episodes(page: int = 1, per_page: int = 10, is_archived: bool | None = False):
     with Session(engine) as session:
         offset = (page - 1) * per_page
 
         count_statement = (
             select(func.count())
             .select_from(Episode)
-            .where(Episode.is_archived == is_archived)
         )
+        if is_archived is not None:
+            count_statement = count_statement.where(Episode.is_archived == is_archived)
+            
         total_count = session.exec(count_statement).one()
 
+        statement = select(Episode)
+        if is_archived is not None:
+            statement = statement.where(Episode.is_archived == is_archived)
+            
         episodes = session.exec(
-            select(Episode)
-            .where(Episode.is_archived == is_archived)
-            .order_by(Episode.create_date.desc())
+            statement.order_by(Episode.create_date.desc())
             .offset(offset)
             .limit(per_page)
         ).all()

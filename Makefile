@@ -16,8 +16,13 @@ dashboard:
 		-v "$$PWD:/app" \
 		-w /app \
 		node:24-alpine \
-	  sh -c "cd /app/dashboard && corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run build"
-
+	  sh -c "\
+			cd /app/dashboard && \
+			corepack enable && \
+			corepack prepare pnpm@latest --activate && \
+			pnpm install && \
+			pnpm run build --deploy-url=/assets/ --base-href=/dashboard/ \
+		"
 
 .PHONY: docker
 docker:

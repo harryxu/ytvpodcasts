@@ -5,8 +5,8 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
 from loguru import logger
@@ -48,7 +48,7 @@ templates = Jinja2Templates(directory="vpodcasts/templates")
 
 @app.get("/")
 def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @app.get("/rss")
@@ -64,12 +64,12 @@ app.mount("/static", StaticFiles(directory=DASHBOARD_DIST_DIR), name="static")
 @app.get("/dashboard")
 @app.get("/dashboard/{path:path}")
 async def dashboard(path: str = ""):
-    return FileResponse(f"{DASHBOARD_DIST_DIR}/index.html")
+    return FileResponse(f"{DASHBOARD_DIST_DIR}/browser/index.html")
 
 
 @app.get("/assets/{path:path}")
 async def assets(path: str = ""):
-    return FileResponse(f"{DASHBOARD_DIST_DIR}/assets/{path}")
+    return FileResponse(f"{DASHBOARD_DIST_DIR}/browser/{path}")
 
 
 @app.get("/episodes/{filename:path}")
@@ -99,7 +99,9 @@ def get_episodes(page: int = 1, per_page: int = 10, status: str = "default"):
     else:
         is_archived = False
 
-    episodes, total_items = db.get_episodes(page=page, per_page=per_page, is_archived=is_archived)
+    episodes, total_items = db.get_episodes(
+        page=page, per_page=per_page, is_archived=is_archived
+    )
     total_pages = math.ceil(total_items / per_page)
     return {
         "data": [episode.model_dump(mode="json") for episode in episodes],

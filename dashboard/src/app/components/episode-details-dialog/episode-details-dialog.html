@@ -1,10 +1,10 @@
-<h2 mat-dialog-title>{{ episode.title }}</h2>
-
 <mat-dialog-content>
   <div class="episode-details">
     @if (episode.thumbnail) {
       <img [src]="episode.thumbnail" [alt]="episode.title" class="episode-thumbnail" />
     }
+
+    <h2 mat-dialog-title class="episode-title">{{ episode.title }}</h2>
 
     <dl class="episode-facts">
       <div class="fact-item">

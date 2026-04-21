@@ -4,8 +4,11 @@
     "editor.formatOnSave": true
   },
 
-  "[javascript][javascriptreact][typescript][typescriptreact][css][scss][less]": {
+  "[javascript][javascriptreact][typescript][typescriptreact][css][scss][less][html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 }

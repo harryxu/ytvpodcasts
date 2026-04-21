@@ -58,7 +58,8 @@ def rss():
     return Response(content=rss_feed, media_type="application/xml")
 
 
-app.mount("/static", StaticFiles(directory=DASHBOARD_DIST_DIR), name="static")
+if os.path.exists(DASHBOARD_DIST_DIR):
+    app.mount("/static", StaticFiles(directory=DASHBOARD_DIST_DIR), name="static")
 
 
 @app.get("/dashboard")

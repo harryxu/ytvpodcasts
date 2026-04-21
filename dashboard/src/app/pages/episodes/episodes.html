@@ -27,11 +27,7 @@
                     <div class="avatar-placeholder"></div>
                   }
 
-                  <div
-                    class="btn-play"
-                    [class.playing]="isPlaying(episode)"
-                    (click)="togglePlay(episode)"
-                  >
+                  <div class="btn-play" [class.playing]="isPlaying(episode)" (click)="togglePlay(episode)">
                     @if (isPlaying(episode)) {
                       <lucide-icon [img]="AudioLinesIcon" size="20" color="#ffffff" />
                     } @else {
@@ -54,10 +50,7 @@
                   <app-episode-meta [episode]="episode" />
                 </div>
 
-                <p
-                  class="episode-description"
-                  [title]="episode.description"
-                >
+                <p class="episode-description" [title]="episode.description">
                   {{ episode.description }}
                 </p>
               </div>

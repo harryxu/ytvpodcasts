@@ -20,6 +20,13 @@
   background: #eceff1;
 }
 
+.episode-title {
+  padding: 0;
+  &::before {
+    display: none;
+  }
+}
+
 .episode-facts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

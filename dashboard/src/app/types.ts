@@ -13,6 +13,7 @@ export interface Episode {
   description: string
   duration: number
   id: string
+  is_archived: boolean
   thumbnail: string
   title: string
   upload_date: string

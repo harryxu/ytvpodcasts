@@ -23,10 +23,17 @@
 </div>
 
 <mat-menu #episodeMenu="matMenu">
-  <button mat-menu-item (click)="archiveEpisode()">
-    <lucide-icon [img]="ArchiveIcon" size="16" />
-    <span>Archive</span>
-  </button>
+  @if (isArchived()) {
+    <button mat-menu-item (click)="unarchiveEpisode()">
+      <lucide-icon [img]="ArchiveRestoreIcon" size="16" />
+      <span>Unarchive</span>
+    </button>
+  } @else {
+    <button mat-menu-item (click)="archiveEpisode()">
+      <lucide-icon [img]="ArchiveIcon" size="16" />
+      <span>Archive</span>
+    </button>
+  }
   <button mat-menu-item (click)="deleteEpisode()" class="delete-item">
     <lucide-icon [img]="TrashIcon" size="16" color="#c62828" />
     <span style="color: #c62828">Delete</span>

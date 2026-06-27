@@ -1,20 +1,20 @@
-import { Component, input, signal, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { injectMutation, QueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LucideAngularModule, Ellipsis, Archive, Trash, Clock } from 'lucide-angular';
+import { LucideAngularModule, Ellipsis, Archive, ArchiveRestore, Trash, Clock } from 'lucide-angular';
 import { NotificationService } from '../../services/notification.service';
 import type { Episode } from '../../types';
 
 @Component({
   selector: 'app-episode-meta',
-  standalone: true,
   imports: [MatIconButton, MatMenuModule, MatProgressSpinnerModule, LucideAngularModule],
   templateUrl: './episode-meta.html',
   styleUrl: './episode-meta.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EpisodeMetaComponent {
   episode = input.required<Episode>();
@@ -25,6 +25,7 @@ export class EpisodeMetaComponent {
 
   readonly EllipsisIcon = Ellipsis;
   readonly ArchiveIcon = Archive;
+  readonly ArchiveRestoreIcon = ArchiveRestore;
   readonly TrashIcon = Trash;
   readonly ClockIcon = Clock;
 
@@ -36,6 +37,14 @@ export class EpisodeMetaComponent {
     },
   }));
 
+  unarchiveMutation = injectMutation(() => ({
+    mutationFn: () => lastValueFrom(this.http.post(`/api/episodes/${this.episode().id}/unarchive`, {})),
+    onSuccess: () => {
+      this.queryClient.invalidateQueries({ queryKey: ['episodesList'] });
+      this.notification.success('Episode has been unarchived.');
+    },
+  }));
+
   deleteMutation = injectMutation(() => ({
     mutationFn: () => lastValueFrom(this.http.delete(`/api/episodes/${this.episode().id}`)),
     onSuccess: () => {
@@ -44,7 +53,14 @@ export class EpisodeMetaComponent {
     },
   }));
 
-  isPending = computed(() => this.archiveMutation.isPending() || this.deleteMutation.isPending());
+  isPending = computed(
+    () =>
+      this.archiveMutation.isPending() ||
+      this.unarchiveMutation.isPending() ||
+      this.deleteMutation.isPending(),
+  );
+
+  isArchived = computed(() => this.episode().is_archived);
 
   get duration(): { hours: number; minutes: number; seconds: number } {
     const d = this.episode().duration;
@@ -57,6 +73,10 @@ export class EpisodeMetaComponent {
 
   archiveEpisode(): void {
     this.archiveMutation.mutate();
+  }
+
+  unarchiveEpisode(): void {
+    this.unarchiveMutation.mutate();
   }
 
   deleteEpisode(): void {

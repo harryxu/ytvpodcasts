@@ -126,6 +126,18 @@ def archive_episode(id):
             raise HTTPException(status_code=404, detail="Episode not found")
 
 
+@app.post("/api/episodes/{id}/unarchive")
+def unarchive_episode(id):
+    with Session(engine) as session:
+        episode = session.exec(select(Episode).where(Episode.id == id)).first()
+        if episode:
+            episode.is_archived = False
+            session.commit()
+            return {"data": episode.model_dump_json()}
+        else:
+            raise HTTPException(status_code=404, detail="Episode not found")
+
+
 @app.delete("/api/episodes/{id}")
 def delete_episode(id):
     with Session(engine) as session:

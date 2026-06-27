@@ -69,6 +69,7 @@ export class EpisodesComponent {
               create_date: new Date().toISOString(),
               upload_date: new Date().toISOString(),
               webpage_url: 'https://example.com',
+              is_archived: false,
             },
             ...data.data,
           ],

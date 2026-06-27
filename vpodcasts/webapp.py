@@ -9,7 +9,6 @@ from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from feedgen.feed import FeedGenerator
-from loguru import logger
 from nats.aio.client import Client as NATS
 from pydantic import BaseModel
 from sqlmodel import Session, select

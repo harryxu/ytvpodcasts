@@ -158,6 +158,14 @@ uvx uv-bump                          # Bump pyproject.toml deps to latest feasib
 | `GET`    | `/api/tasks`                 | List recent download tasks                       |
 | `GET`    | `/api/eventstream`           | SSE stream for real-time task notifications      |
 
+### Testing
+
+Backend tests live in `tests/`. The test suite uses **pytest** with FastAPI's `TestClient` (backed by `httpx`).
+
+```bash
+# Run all backend tests (inside the dev container):
+uv run pytest
+```
 ---
 
 ## Frontend (Angular / `dashboard/`)

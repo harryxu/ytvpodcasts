@@ -1226,9 +1226,11 @@ dependencies = [
     { name = "filelock" },
     { name = "honcho" },
     { name = "httptools" },
+    { name = "httpx" },
     { name = "loguru" },
     { name = "lxml" },
     { name = "nats-py" },
+    { name = "pytest" },
     { name = "python-dateutil" },
     { name = "python-dotenv" },
     { name = "six" },
@@ -1242,12 +1244,6 @@ dependencies = [
     { name = "yt-dlp", extra = ["default"] },
 ]
 
-[package.dev-dependencies]
-test = [
-    { name = "httpx" },
-    { name = "pytest" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.18.4" },
@@ -1257,9 +1253,11 @@ requires-dist = [
     { name = "filelock", specifier = ">=3.28.0" },
     { name = "honcho", specifier = ">=2.0.0" },
     { name = "httptools", specifier = ">=0.7.1" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "lxml", specifier = "==6.0.2" },
     { name = "nats-py", specifier = ">=2.14.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "six", specifier = ">=1.17.0" },
@@ -1271,12 +1269,6 @@ requires-dist = [
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.44.0" },
     { name = "uvloop", specifier = ">=0.22.1" },
     { name = "yt-dlp", extras = ["default"], specifier = ">=2026.3.17" },
-]
-
-[package.metadata.requires-dev]
-test = [
-    { name = "httpx", specifier = ">=0.28" },
-    { name = "pytest", specifier = ">=8.0" },
 ]
 
 [[package]]

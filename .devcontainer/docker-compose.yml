@@ -1,7 +1,9 @@
 name: vpodcasts_devcontainer
 services:
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/python:3.13
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: vpodcasts-dev
     environment:
       TZ: ${TZ:-Asia/Shanghai}
